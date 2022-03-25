@@ -1,0 +1,29 @@
+version: '3'
+
+services:
+  team-catalog.php:
+    image: elitonluiz1989/php
+
+    container_name: team-catalog.php
+
+    ports:
+      - "8000:8000"
+
+    volumes:
+      - .:/var/www/html/
+
+    working_dir: /var/www/html/
+
+  team-catalog.mysql:
+    image: mysql
+
+    container_name: team-catalog.mysql
+
+    ports:
+      - "3306:3306"
+
+    environment:
+      - MYSQL_ROOT_PASSWORD=secret
+      - MYSQL_DATABASE=team-catalog
+      - MYSQL_USER=elitonluiz
+      - MYSQL_PASSWORD=secret

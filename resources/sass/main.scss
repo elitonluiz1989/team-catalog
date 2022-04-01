@@ -1,0 +1,27 @@
+body {
+  background-color: $color-quill-gray;
+}
+
+.header {
+  height: fit-content;
+  background-color: $color-baltic-sea;
+
+  %header-default-color {
+    color: $color-saffron !important;
+  }
+
+  &__title {
+    a {
+      @extend %header-default-color;
+    }
+  }
+
+  &__toggler {
+    border-color: $color-saffron;
+    @extend %header-default-color;
+  }
+
+  .navbar-collapse a {
+    @extend %header-default-color;
+  }
+}

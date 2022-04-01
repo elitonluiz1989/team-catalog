@@ -1,6 +1,19 @@
 version: '3'
 
 services:
+  team-catalog.vue:
+    image: elitonluiz1989/vue
+
+    container_name: team-catalog.vue
+
+    ports:
+      - "8080:8080"
+
+    volumes:
+      - .:/app
+
+    working_dir: /app
+
   team-catalog.php:
     image: elitonluiz1989/php
 
@@ -10,9 +23,9 @@ services:
       - "8000:8000"
 
     volumes:
-      - .:/var/www/html/
+      - .:/app
 
-    working_dir: /var/www/html/
+    working_dir: /app
 
   team-catalog.mysql:
     image: mysql

@@ -29,4 +29,11 @@ class AuthenticateRequest extends FormRequest
             'remember' => 'nullable|boolean'
         ];
     }
+
+    protected function prepareForValidation()
+    {
+        $this->merge([
+            'remember' => !empty($this['remember']),
+        ]);
+    }
 }

@@ -27,7 +27,7 @@ class AuthController extends Controller
             redirect()
                 ->route('login')
                 ->withErrors('Invalid email or password')
-                ->withInput(['email']);;
+                ->withInput(['email']);
         }
 
         $request->session()->regenerate();

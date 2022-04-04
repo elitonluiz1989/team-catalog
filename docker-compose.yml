@@ -37,6 +37,6 @@ services:
 
     environment:
       - MYSQL_ROOT_PASSWORD=secret
-      - MYSQL_DATABASE=team-catalog
+      - MYSQL_DATABASE=team_catalog
       - MYSQL_USER=elitonluiz
       - MYSQL_PASSWORD=secret

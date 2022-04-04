@@ -13,6 +13,18 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('login', 'App\Http\Controllers\Admin\AuthController@login')->name('login');
-Route::post('login', 'App\Http\Controllers\Admin\AuthController@authenticate')->name('login.authenticate');
-Route::get('logout', 'App\Http\Controllers\Admin\AuthController@logout')->name('logout');
+Route::namespace('App\Http\Controllers\Admin')
+    ->group(function() {
+        Route::get('login', 'AuthController@login')->name('login');
+        Route::post('login', 'AuthController@authenticate')->name('login.authenticate');
+
+        Route::middleware('auth')
+            ->group(function() {
+                Route::get('logout', 'AuthController@logout')->name('logout');
+
+                Route::prefix('users/')
+                    ->group(function() {
+                        Route::get('', 'UsersController@index')->name('users.index');
+                    });
+            });
+    });

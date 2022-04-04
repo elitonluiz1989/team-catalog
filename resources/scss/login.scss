@@ -1,0 +1,17 @@
+.login {
+  background-color: $color-baltic-sea;
+
+  label {
+    color: white;
+  }
+
+  a:link, a:visited, a:hover, a:active{
+    color: $color-pesto;
+  }
+
+  &-form {
+    &__submit {
+      background-color: $color-saffron;
+    }
+  }
+}

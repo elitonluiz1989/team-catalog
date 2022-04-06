@@ -25,6 +25,8 @@ Route::namespace('App\Http\Controllers\Admin')
                 Route::prefix('users/')
                     ->group(function() {
                         Route::get('', 'UsersController@index')->name('users.index');
+                        Route::get('/create', 'UsersController@create')->name('users.create');
+                        Route::post('/store', 'UsersController@store')->name('users.store');
                     });
             });
     });

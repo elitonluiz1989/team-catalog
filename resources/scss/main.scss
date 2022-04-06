@@ -25,3 +25,8 @@ body {
     @extend %header-default-color;
   }
 }
+
+.page-title {
+  background-color: $color-saffron;
+  border-bottom: 1px solid $color-baltic-sea;
+}

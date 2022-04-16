@@ -47,7 +47,7 @@
         </nav>
     </header>
 
-    <section class="ps-md-3 pe-md-3">
+    <section>
         @yield('view')
     </section>
 

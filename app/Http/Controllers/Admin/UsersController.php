@@ -13,8 +13,13 @@ use Illuminate\Http\Request;
 
 class UsersController extends Controller
 {
-    public function index(): View|Factory {
-        return view('admin.users.index');
+    public function index(): View|Factory
+    {
+        $users = User::paginate(11);
+
+        return view('admin.users.index')
+            ->with('users', $users)
+            ->with('currentUserId', auth()->user()->id);
     }
 
     public function create(Request $request): View|Factory {

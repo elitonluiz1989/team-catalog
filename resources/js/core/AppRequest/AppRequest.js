@@ -1,14 +1,29 @@
+import axios, { AxiosRequestConfig } from "axios";
+
 import {AppResponse} from "./AppResponse";
+import {isNullOrUndefined} from "../Helpers";
 
 export class AppRequest {
+    /**
+     *
+     * @type {AxiosRequestConfig}
+     */
+    #requestConfig;
+
     /**
      *
      * @param {AppRequestSettings} settings
      */
     constructor(settings) {
-        this.url = settings.url;
-        this.method = settings.method;
-        this.data = settings.data;
+        // noinspection JSValidateTypes
+        this.#requestConfig = {
+            url: settings.url,
+            method: settings.method,
+            data: settings.data,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        }
     }
 
     /**
@@ -19,17 +34,37 @@ export class AppRequest {
         const response = new AppResponse();
 
         try {
-            const result = await axios({
-                url: this.url,
-                method: this.method,
-                data: this.data
-            });
+            const result = await axios(this.#requestConfig);
 
-            response.setData(result.data);
-        } catch(error) {
-            response.setErrors(error);
+            response.setData(result);
+        }
+        catch(error) {
+            response.setData(error);
         }
 
         return response;
+    }
+
+    /**
+     * @param {any} data
+     */
+    setData(data) {
+        this.#requestConfig.data = data;
+    }
+
+    /**
+     *
+     * @returns {any}
+     */
+    get data() {
+        return this.#requestConfig.data;
+    }
+
+    /**
+     *
+     * @returns {boolean}
+     */
+    get hasData() {
+        return !isNullOrUndefined(this.#requestConfig.data);
     }
 }

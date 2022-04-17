@@ -1,3 +1,5 @@
+import StateEnum from "./AppFormMessageStateEnum";
+
 export class AppFormMessage {
     /**
      * @type {HTMLFormElement}
@@ -26,39 +28,53 @@ export class AppFormMessage {
 
     /**
      *
-     * @param {AppResponseContent[]} errors
+     * @param {AppResponseData[]} errors
      */
     errors(errors) {
-        this.#createContainer();
-        this.#resetContainer('alert-danger');
+        this.#createMessage(
+            errors,
+            StateEnum.ERROR,
+            (error) => {
+                if (error.target) {
+                    const formElement = this.#form.querySelector(`[name="${error.target}"]`);
 
-        for (const error of errors) {
-            const child = this.#createMessageContainer(error);
-
-            this.#container.appendChild(child);
-
-            if (error.target) {
-                const formElement = this.#form.querySelector(`[name="${error.target}"]`);
-
-                if (formElement) {
-                    formElement.classList.add('is-invalid');
+                    if (formElement) {
+                        formElement.classList.add('is-invalid');
+                    }
                 }
-            }
-        }
+        });
     }
 
     /**
      *
-     * @param {AppResponseContent} data
+     * @param {AppResponseData[]} data
      * @returns {Promise<void>}
      */
     async success(data) {
+        this.#createMessage(data, StateEnum.SUCCESS);
+    }
+
+    /**
+     *
+     * @param {AppResponseData[]} data
+     * @param {string} stateStyle
+     * @param {?Function} callback
+     */
+    #createMessage(data, stateStyle, callback = null) {
         this.#createContainer();
-        this.#resetContainer('alert-success');
+        this.#resetContainer(stateStyle);
 
-        const child = this.#createMessageContainer(data);
+        let child = null;
 
-        this.#container.appendChild(child);
+        for (const content of data) {
+            child = this.#createMessageContainer(content);
+
+            this.#container.appendChild(child);
+
+            if (callback instanceof Function) {
+                callback(content);
+            }
+        }
     }
 
     remove() {
@@ -73,11 +89,11 @@ export class AppFormMessage {
         const body = document.querySelector('body');
 
         if (!mask) {
-            mask = this.#createLoadingMask(body);
+            mask = AppFormMessage.#createLoadingMask(body);
         }
 
         if (!container) {
-            container = this.#createLoadingContainer(body);
+            container = AppFormMessage.#createLoadingContainer(body);
         }
 
         mask.classList.remove('d-none');
@@ -144,14 +160,14 @@ export class AppFormMessage {
 
     /**
      *
-     * @param {AppResponseContent} error
+     * @param {AppResponseData} data
      * @returns {HTMLDivElement}
      */
-    #createMessageContainer(error) {
-        const messageIdentifier = error.target ?? this.#form.id ?? this.#form.getAttribute('name');
+    #createMessageContainer(data) {
+        const messageIdentifier = data.target ?? this.#form.id ?? this.#form.getAttribute('name');
         const container = document.createElement('div');
         container.classList.add(`${messageIdentifier}-message`);
-        container.textContent = error.data;
+        container.textContent = data.content;
 
         return container;
     }
@@ -161,7 +177,7 @@ export class AppFormMessage {
      * @param {HTMLBodyElement} body
      * @returns {HTMLDivElement}
      */
-    #createLoadingMask(body) {
+    static #createLoadingMask(body) {
         const mask = document.createElement('div');
         mask.classList.add(
             'mask',
@@ -181,7 +197,7 @@ export class AppFormMessage {
      * @param {HTMLBodyElement} body
      * @returns {HTMLDivElement}
      */
-    #createLoadingContainer(body) {
+    static #createLoadingContainer(body) {
         const srOnly = document.createElement('span');
         srOnly.classList.add('sr-only');
         srOnly.textContent = 'Loading...';

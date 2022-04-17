@@ -1,7 +1,7 @@
 import {AppModal} from "../AppModal/AppModal";
 import {AppFormMessage} from "../AppFormMessage/AppFormMessage";
 import {AppRequest} from "../AppRequest/AppRequest";
-import {Helpers} from "../Helpers";
+import {delay} from "../Helpers";
 import {AppRequestSettings} from "../AppRequest/AppRequestSettings";
 
 export class AppForm {
@@ -60,27 +60,29 @@ export class AppForm {
     async execute() {
         await this.#message.showLoading();
 
-        if (!this.#request.data) {
-            this.#request.data = this.#getFormData();
+        if (!this.#request.hasData) {
+            this.#request.setData(this.#getFormData());
         }
 
         const response = await this.#request.execute();
 
         await this.#message.hideLoading();
 
-        if (response.hasErrors()) {
-            this.#message.errors(response.getErrors());
-        } else {
-            await this.#message.success(response.getData());
-            await Helpers.delay(2000);
-
-            this.#form.reset();
-            this.#message.remove();
-
-            await this.#modal.hide();
-
-            window.location.reload();
+        if (response.hasErrors) {
+            this.#message.errors(response.data);
+            return;
         }
+
+        await this.#message.success(response.data);
+
+        await delay(2000);
+
+        this.#form.reset();
+        this.#message.remove();
+
+        await this.#modal.hide();
+
+        window.location.reload();
     }
 
     addInvalidFieldEventHandler() {

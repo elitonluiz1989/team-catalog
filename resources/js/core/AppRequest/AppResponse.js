@@ -1,66 +1,104 @@
-import {AppResponseContent} from "./AppResponseContent";
+import { AxiosResponse, AxiosError } from "axios";
+
+import {AppResponseData} from "./AppResponseData";
 
 export class AppResponse {
     /**
      *
-     * @type {AppResponseContent}
+     * @type {AxiosResponse}
      */
-    #data = new AppResponseContent();
+    #response;
 
     /**
      *
-     * @type {AppResponseContent[]}
+     * @type {AppResponseData[]}
      */
-    #errors = [];
+    #data;
 
     /**
      *
-     * @param {*} data
+     * @type {boolean}
      */
-    setData(data) {
-        this.#data.data = data;
+    #withErrors;
+
+    /**
+     *
+     * @param {?AxiosResponse} response
+     * @param {AppResponseData[]} data
+     * @param {Boolean} withErrors
+     */
+    constructor(
+        response = null,
+        data = [],
+        withErrors = false
+    ) {
+        this.#response = response;
+        this.#data = data;
+        this.#withErrors = withErrors;
     }
 
     /**
      *
-     * @returns {AppResponseContent}
+     * @param {AxiosResponse|AxiosError} response
      */
-    getData() {
-        return this.#data;
-    }
+    setData(response) {
+        this.#withErrors = response instanceof Error;
 
-    /**
-     *
-     * @param error
-     */
-    setErrors(error) {
-        this.#errors = [];
-
-        if (error.response?.data?.errors) {
-            for (const key in error.response.data.errors) {
-                for (const message of error.response.data.errors[key]) {
-                    this.#errors.push(new AppResponseContent(key, message));
-                }
-            }
-        } else {
-            const message = error.response?.data?.message ?? error.message;
-            this.#errors.push(new AppResponseContent('application', message));
+        if (this.#withErrors) {
+            this.#setErrors(response);
+            return;
         }
+
+        this.#response = response;
+
+        this.#initializeData(new AppResponseData(null, response.data));
     }
 
     /**
      *
-     * @returns {AppResponseContent[]}
+     * @returns {AppResponseData[]}
      */
-    getErrors() {
-        return this.#errors || [];
+    get data() {
+        return this.#data;
     }
 
     /**
      *
      * @returns {boolean}
      */
-    hasErrors() {
-        return this.#errors.length > 0;
+    get hasErrors() {
+        return this.#withErrors && this.#data.length > 0;
+    }
+
+    /**
+     *
+     * @param {?AppResponseData} defaultValue
+     */
+    #initializeData(defaultValue= null) {
+        this.#data = [];
+
+        if (defaultValue instanceof AppResponseData) {
+            this.#data.push(defaultValue);
+        }
+    }
+
+    /**
+     *
+     * @param {AxiosError} error
+     */
+    #setErrors(error) {
+        this.#initializeData();
+        this.#response = error.response;
+
+        if (this.#response.data?.errors) {
+            for (const key in this.#response.data.errors) {
+                for (const message of error.response.data.errors[key]) {
+                    this.#data.push(new AppResponseData(key, message));
+                }
+            }
+        } else {
+            const message = this.#response.data?.message ?? error.message;
+            this.#data.push(new AppResponseData(null, message));
+        }
     }
 }

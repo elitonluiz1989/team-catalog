@@ -83,40 +83,6 @@ export class AppFormMessage {
         this.#container.innerHTML = '';
     }
 
-    async showLoading() {
-        let mask = document.querySelector('.mask');
-        let container = document.querySelector('.mask__content');
-        const body = document.querySelector('body');
-
-        if (!mask) {
-            mask = AppFormMessage.#createLoadingMask(body);
-        }
-
-        if (!container) {
-            container = AppFormMessage.#createLoadingContainer(body);
-        }
-
-        mask.classList.remove('d-none');
-        mask.classList.add('show');
-        container.classList.remove('d-none');
-        container.classList.add('d-flex');
-    }
-
-    async hideLoading() {
-        const mask = document.querySelector('.mask');
-        const container = document.querySelector('.mask__content');
-
-        if (mask) {
-            mask.classList.remove('show');
-            mask.classList.add('d-none');
-        }
-
-        if (container) {
-            container.classList.remove('d-flex');
-            container.classList.add('d-none');
-        }
-    }
-
     #createContainer() {
         const selector = this.#messageContainerSelector || '.alert';
         this.#container = this.#form.querySelector(selector);
@@ -168,58 +134,6 @@ export class AppFormMessage {
         const container = document.createElement('div');
         container.classList.add(`${messageIdentifier}-message`);
         container.textContent = data.content;
-
-        return container;
-    }
-
-    /**
-     *
-     * @param {HTMLBodyElement} body
-     * @returns {HTMLDivElement}
-     */
-    static #createLoadingMask(body) {
-        const mask = document.createElement('div');
-        mask.classList.add(
-            'mask',
-            'fade',
-            'h-100',
-            'w-100',
-            'position-fixed'
-        );
-
-        body.appendChild(mask);
-
-        return mask;
-    }
-
-    /**
-     *
-     * @param {HTMLBodyElement} body
-     * @returns {HTMLDivElement}
-     */
-    static #createLoadingContainer(body) {
-        const srOnly = document.createElement('span');
-        srOnly.classList.add('sr-only');
-        srOnly.textContent = 'Loading...';
-
-        const spinner = document.createElement('div');
-        spinner.classList.add('spinner-border');
-        spinner.setAttribute('role', 'status');
-        spinner.appendChild(srOnly);
-
-        const container = document.createElement('div');
-        container.classList.add(
-            'mask__content',
-            'd-none',
-            'h-100',
-            'w-100',
-            'position-fixed',
-            'align-items-center',
-            'justify-content-center'
-        );
-        container.appendChild(spinner);
-
-        body.appendChild(container);
 
         return container;
     }

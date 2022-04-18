@@ -3,6 +3,8 @@ import {AppFormMessage} from "../AppFormMessage/AppFormMessage";
 import {AppRequest} from "../AppRequest/AppRequest";
 import {delay} from "../Helpers";
 import {AppRequestSettings} from "../AppRequest/AppRequestSettings";
+import {AppMask} from "../AppMask/AppMask";
+import {AppMaskSettings} from "../AppMask/AppMaskSettings";
 
 export class AppForm {
     /**
@@ -31,6 +33,12 @@ export class AppForm {
 
     /**
      *
+     * @type {AppMask}
+     */
+    #mask;
+
+    /**
+     *
      * @param {AppFormSettings} settings
      */
     constructor(settings) {
@@ -51,14 +59,17 @@ export class AppForm {
         if (settings.modal) {
             this.#modal = new AppModal(settings.modal);
         }
+
+        if (!settings.mask) {
+            settings.mask = new AppMaskSettings();
+            settings.mask.withLoading = true;
+        }
+
+        this.#mask = new AppMask(settings.mask);
     }
 
-    /**
-     *
-     * @returns {Promise<void>}
-     */
     async execute() {
-        await this.#message.showLoading();
+        await this.#mask.show();
 
         if (!this.#request.hasData) {
             this.#request.setData(this.#getFormData());
@@ -66,7 +77,7 @@ export class AppForm {
 
         const response = await this.#request.execute();
 
-        await this.#message.hideLoading();
+        await this.#mask.hide();
 
         if (response.hasErrors) {
             this.#message.errors(response.data);

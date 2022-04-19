@@ -58,6 +58,7 @@ export class AppForm {
 
         if (settings.modal) {
             this.#modal = new AppModal(settings.modal);
+            this.#onFormClose();
         }
 
         if (!settings.mask) {
@@ -91,7 +92,7 @@ export class AppForm {
         this.#form.reset();
         this.#message.remove();
 
-        await this.#modal.hide();
+        await this.#modal.close();
 
         window.location.reload();
     }
@@ -128,5 +129,12 @@ export class AppForm {
         }
 
         return formData;
+    }
+
+    #onFormClose() {
+        this.#modal?.afterClose(() => {
+            this.#form.reset();
+            this.#message.remove();
+        });
     }
 }

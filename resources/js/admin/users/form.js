@@ -12,6 +12,7 @@ import {AppForm} from "../../core/AppForm/AppForm";
     settings.message.container = '#user-form-messages';
 
     settings.modal = new AppModalSettings(
+        '#user-store-modal',
         '#user-store-modal-opener-btn',
         '#user-store-modal-dismiss-btn'
     );

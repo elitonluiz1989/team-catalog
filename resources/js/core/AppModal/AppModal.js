@@ -3,6 +3,12 @@ export class AppModal {
      *
      * @type {HTMLElement}
      */
+    #modal;
+
+    /**
+     *
+     * @type {HTMLElement}
+     */
     #openerButton;
 
     /**
@@ -16,15 +22,20 @@ export class AppModal {
      * @param {AppModalSettings} settings
      */
     constructor(settings) {
+        this.#modal = document.querySelector(settings.modalSelector);
         this.#openerButton = document.querySelector(settings.openerButtonSelector);
         this.#dismissButton = document.querySelector(settings.dismissButtonSelector);
     }
 
-    show() {
+    open() {
         this.#openerButton?.click();
     }
 
-    async hide() {
+    async close() {
         this.#dismissButton?.click();
+    }
+
+    afterClose(callback) {
+        this.#modal?.addEventListener('hidden.bs.modal', callback);
     }
 }

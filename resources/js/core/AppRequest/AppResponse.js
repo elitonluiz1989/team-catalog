@@ -1,6 +1,6 @@
 import { AxiosResponse, AxiosError } from "axios";
 
-import {AppResponseData} from "./AppResponseData";
+import {AppResponseError} from "./AppResponseError";
 
 export class AppResponse {
     /**
@@ -11,52 +11,67 @@ export class AppResponse {
 
     /**
      *
-     * @type {AppResponseData[]}
+     * @type {any}
      */
     #data;
 
     /**
      *
-     * @type {boolean}
+     * @type {AppResponseError[]}
      */
-    #withErrors;
+    #errors = [];
 
     /**
      *
      * @param {?AxiosResponse} response
-     * @param {AppResponseData[]} data
-     * @param {Boolean} withErrors
+     * @param {any} data
+     * @param {AppResponseError[]} errors
      */
     constructor(
         response = null,
-        data = [],
-        withErrors = false
+        data = null,
+        errors = []
     ) {
         this.#response = response;
         this.#data = data;
-        this.#withErrors = withErrors;
+        this.#errors = errors;
     }
 
     /**
      *
-     * @param {AxiosResponse|AxiosError} response
+     * @param {AxiosResponse} response
      */
     setData(response) {
-        this.#withErrors = response instanceof Error;
-
-        if (this.#withErrors) {
-            this.#setErrors(response);
-            return;
+        if (typeof response === 'object') {
+            this.#response = response;
         }
 
-        this.#response = response;
-
-        this.#initializeData(new AppResponseData(null, response.data));
+        this.#data = response?.data ?? response.toString();
     }
 
     /**
      *
-     * @returns {AppResponseData[]}
+     * @param {AxiosError} error
+     */
+    setErrors(error) {
+        this.#errors = [];
+        this.#response = error.response;
+
+        if (this.#response?.data?.errors) {
+            for (const key in this.#response.data.errors) {
+                for (const message of error.response.data.errors[key]) {
+                    this.#errors.push(new AppResponseError(key, message));
+                }
+            }
+        } else {
+            const message = this.#response?.data?.message ?? error.message;
+            this.#errors.push(new AppResponseError(null, message));
+        }
+    }
+
+    /**
+     *
+     * @returns {any}
      */
     get data() {
         return this.#data;
@@ -64,41 +79,17 @@ export class AppResponse {
 
     /**
      *
+     * @returns {AppResponseError[]}
+     */
+    get errors() {
+        return this.#errors;
+    }
+
+    /**
+     *
      * @returns {boolean}
      */
     get hasErrors() {
-        return this.#withErrors && this.#data.length > 0;
-    }
-
-    /**
-     *
-     * @param {?AppResponseData} defaultValue
-     */
-    #initializeData(defaultValue= null) {
-        this.#data = [];
-
-        if (defaultValue instanceof AppResponseData) {
-            this.#data.push(defaultValue);
-        }
-    }
-
-    /**
-     *
-     * @param {AxiosError} error
-     */
-    #setErrors(error) {
-        this.#initializeData();
-        this.#response = error.response;
-
-        if (this.#response.data?.errors) {
-            for (const key in this.#response.data.errors) {
-                for (const message of error.response.data.errors[key]) {
-                    this.#data.push(new AppResponseData(key, message));
-                }
-            }
-        } else {
-            const message = this.#response.data?.message ?? error.message;
-            this.#data.push(new AppResponseData(null, message));
-        }
+        return this.#errors.length > 0;
     }
 }

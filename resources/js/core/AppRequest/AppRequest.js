@@ -39,7 +39,7 @@ export class AppRequest {
             response.setData(result);
         }
         catch(error) {
-            response.setData(error);
+            response.setErrors(error);
         }
 
         return response;

@@ -80,7 +80,7 @@ export class AppForm {
         await this.#mask.hide();
 
         if (response.hasErrors) {
-            this.#message.errors(response.data);
+            this.#message.errors(response.errors);
             return;
         }
 

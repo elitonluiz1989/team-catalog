@@ -1,4 +1,5 @@
-import StateEnum from "./AppFormMessageStateEnum";
+import {AppResponseError} from "../AppRequest/AppResponseError";
+import {randId} from "../Helpers";
 
 export class AppFormMessage {
     /**
@@ -28,53 +29,34 @@ export class AppFormMessage {
 
     /**
      *
-     * @param {AppResponseData[]} errors
+     * @param {AppResponseError[]} errors
      */
     errors(errors) {
-        this.#createMessage(
-            errors,
-            StateEnum.ERROR,
-            (error) => {
-                if (error.target) {
-                    const formElement = this.#form.querySelector(`[name="${error.target}"]`);
-
-                    if (formElement) {
-                        formElement.classList.add('is-invalid');
-                    }
-                }
-        });
-    }
-
-    /**
-     *
-     * @param {AppResponseData[]} data
-     * @returns {Promise<void>}
-     */
-    async success(data) {
-        this.#createMessage(data, StateEnum.SUCCESS);
-    }
-
-    /**
-     *
-     * @param {AppResponseData[]} data
-     * @param {string} stateStyle
-     * @param {?Function} callback
-     */
-    #createMessage(data, stateStyle, callback = null) {
         this.#createContainer();
-        this.#resetContainer(stateStyle);
+        this.#resetContainer(`alert-danger`);
 
-        let child = null;
+        for (const error of errors) {
+            this.#createMessage(error.content, error.target);
 
-        for (const content of data) {
-            child = this.#createMessageContainer(content);
+            if (error.target) {
+                const formElement = this.#form.querySelector(`[name="${error.target}"]`);
 
-            this.#container.appendChild(child);
-
-            if (callback instanceof Function) {
-                callback(content);
+                if (formElement) {
+                    formElement.classList.add('is-invalid');
+                }
             }
         }
+    }
+
+    /**
+     *
+     * @param {string} message
+     * @returns {Promise<void>}
+     */
+    async success(message) {
+        this.#createContainer();
+        this.#resetContainer(`alert-success`);
+        this.#createMessage(message);
     }
 
     remove() {
@@ -126,15 +108,16 @@ export class AppFormMessage {
 
     /**
      *
-     * @param {AppResponseData} data
-     * @returns {HTMLDivElement}
+     * @param {string} message
+     * @param {?string} identifier
      */
-    #createMessageContainer(data) {
-        const messageIdentifier = data.target ?? this.#form.id ?? this.#form.getAttribute('name');
-        const container = document.createElement('div');
-        container.classList.add(`${messageIdentifier}-message`);
-        container.textContent = data.content;
+    #createMessage(message, identifier = null) {
+        identifier = identifier ?? randId();
 
-        return container;
+        const messageContainer = document.createElement('div');
+        messageContainer.classList.add(`${identifier}-message`);
+        messageContainer.textContent = message;
+
+        this.#container.appendChild(messageContainer);
     }
 }

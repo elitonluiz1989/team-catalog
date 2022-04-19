@@ -1,8 +1,8 @@
-export class AppResponseData {
+export class AppResponseError {
     /**
      *
      * @param {?string} target
-     * @param {*} content
+     * @param {any} content
      */
     constructor(
         target = null,

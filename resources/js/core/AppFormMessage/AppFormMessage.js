@@ -1,5 +1,5 @@
 import {AppResponseError} from "../AppRequest/AppResponseError";
-import {randId} from "../Helpers";
+import {randId} from "../helpers";
 
 export class AppFormMessage {
     /**
@@ -60,9 +60,11 @@ export class AppFormMessage {
     }
 
     remove() {
-        this.#container.classList.remove('show');
-        this.#container.classList.add('d-none');
-        this.#container.innerHTML = '';
+        if (this.#container) {
+            this.#container.classList.remove('show');
+            this.#container.classList.add('d-none');
+            this.#container.innerHTML = '';
+        }
     }
 
     #createContainer() {

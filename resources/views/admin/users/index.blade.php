@@ -21,8 +21,9 @@
 
                     <div class="user__item d-flex justify-content-evenly pt-2 pb-3">
                         <button
-                            class="btn btn-outline-secondary"
-                            data-user-id="{{ $user->id }}">
+                            class="user__edit-action btn btn-outline-secondary"
+                            data-find-route="{{ route('users.find', $user->id) }}"
+                            data-action-route="{{ route('users.update', $user->id) }}">
                             <i class="fas fa-pen"></i>
                         </button>
 
@@ -54,7 +55,7 @@
         <x-modals.form-modal
             modal-id="user-store-modal"
             modal-dismiss-btn-id="user-store-modal-dismiss-btn"
-            title="Create an user"
+            title="User"
             form-id="user-form"
             form-action="{{ route('users.store') }}"
             form-method="{{ \App\Enums\HttpMethodsEnum::POST }}">

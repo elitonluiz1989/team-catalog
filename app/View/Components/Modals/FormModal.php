@@ -18,7 +18,8 @@ class FormModal extends Component
         public string  $formAction,
         public string  $formMethod,
         public ?string $modalId = null,
-        public ?string $modalDismissBtnId = null
+        public ?string $modalDismissBtnId = null,
+        public ?string $titleId = null
     )
     {
     }
@@ -32,6 +33,7 @@ class FormModal extends Component
     {
         $this->modalId = $this->modalId ?? 'app-modal';
         $this->modalDismissBtnId = $this->modalDismissBtnId ?? 'app-modal-dismiss-btn';
+        $this->modalId = $this->modalId ?? 'app-title';
         $ariaLabelledby = "{$this->modalId}-label";
 
         return view('components.modals.form-modal')

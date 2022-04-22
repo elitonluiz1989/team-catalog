@@ -1,7 +1,7 @@
 import {AppModal} from "../AppModal/AppModal";
 import {AppFormMessage} from "../AppFormMessage/AppFormMessage";
 import {AppRequest} from "../AppRequest/AppRequest";
-import {delay} from "../Helpers";
+import {delay} from "../helpers";
 import {AppRequestSettings} from "../AppRequest/AppRequestSettings";
 import {AppMask} from "../AppMask/AppMask";
 import {AppMaskSettings} from "../AppMask/AppMaskSettings";
@@ -12,6 +12,24 @@ export class AppForm {
      * @type {HTMLFormElement}
      */
     #form
+
+    /**
+     *
+     * @type {HTMLInputElement}
+     */
+    #recordIdentifier;
+
+    /**
+     *
+     * @type {string[]}
+     */
+    #disabledFields = [];
+
+    /**
+     *
+     * @type {boolean}
+     */
+    #removeDisabledFieldsOnSubmit = false;
 
     /**
      *
@@ -58,7 +76,7 @@ export class AppForm {
 
         if (settings.modal) {
             this.#modal = new AppModal(settings.modal);
-            this.#onFormClose();
+            this.onFormModalClose();
         }
 
         if (!settings.mask) {
@@ -69,7 +87,94 @@ export class AppForm {
         this.#mask = new AppMask(settings.mask);
     }
 
-    async execute() {
+    createRecordIdentifier(name, value) {
+        const elementId = `record-${name}`;
+
+        this.#recordIdentifier = document.getElementById(elementId);
+
+        if (this.#recordIdentifier === null) {
+            this.#recordIdentifier = document.createElement('input');
+            this.#recordIdentifier.id = `record-${name}`;
+            this.#recordIdentifier.setAttribute('type', 'hidden');
+            this.#recordIdentifier.setAttribute('name', name);
+        }
+
+        this.#recordIdentifier.value = value;
+
+        this.#form.appendChild(this.#recordIdentifier);
+    }
+
+    /**
+     *
+     * @param {string} url
+     * @param {?string} method
+     */
+    setRoute(url, method = null) {
+        this.#form.setAttribute('action', url);
+        this.#request.url(url);
+
+        if (method) {
+            this.#form.setAttribute('method', method);
+            this.#request.method(method);
+        }
+    }
+
+    /**
+     *
+     * @param {any} data
+     */
+    fill(data) {
+        for (const item in data) {
+            if (this.#form.hasOwnProperty(item)) {
+                this.#form[item].value = data[item];
+            }
+        }
+    }
+
+    /**
+     *
+     * @param {string} name
+     */
+    enableField(name) {
+        if (this.#form.hasOwnProperty(name)) {
+            this.#form[name].removeAttribute('disabled');
+        }
+    }
+
+    /**
+     *
+     * @param {string} fields
+     */
+    disableFields(...fields) {
+        if (fields && fields.length > 0) {
+            for (const field of fields) {
+                this.disableField(field);
+            }
+        }
+    }
+
+    /**
+     *
+     * @param {string} field
+     */
+    disableField(field) {
+        if (this.#form.hasOwnProperty(field)) {
+            this.#form[field].setAttribute('disabled', true);
+            this.#disabledFields.push(field);
+        }
+    }
+
+    removeDisabledFieldsOnSubmit() {
+        this.#removeDisabledFieldsOnSubmit = true;
+    }
+
+    open() {
+        if (this.#modal) {
+            this.#modal.open();
+        }
+    }
+
+    async submit() {
         await this.#mask.show();
 
         if (!this.#request.hasData) {
@@ -112,29 +217,51 @@ export class AppForm {
     addSubmitEventHandler() {
         this.#form.addEventListener('submit', async (evt) => {
             evt?.preventDefault();
-            await this.execute();
+            await this.submit();
         });
     }
 
     /**
      *
-     * @returns {FormData}
+     * @param {?Function} callback
+     */
+    onFormModalClose(callback= null) {
+        if (this.#modal) {
+            this.#modal.removeAfterCloseEvent();
+
+            this.#modal.addAfterCloseEvent(() => {
+                this.#form.reset();
+                this.#recordIdentifier?.remove();
+
+                for (const field of this.#disabledFields) {
+                    this.enableField(field);
+                }
+
+                this.#message.remove();
+
+                if (callback instanceof Function) {
+                    callback(this);
+                }
+            });
+        }
+    }
+
+    /**
+     *
+     * @returns {object}
      */
     #getFormData() {
-        const formData = new FormData();
+        const formData = {};
         const elements = this.#form.querySelectorAll('input,select,textarea');
 
         for (const element of elements) {
-            formData.append(element.getAttribute('name'), element.value)
+            if (this.#removeDisabledFieldsOnSubmit && element.getAttribute('disabled')) {
+                continue;
+            }
+
+            formData[element.getAttribute('name')] = element.value;
         }
 
         return formData;
-    }
-
-    #onFormClose() {
-        this.#modal?.afterClose(() => {
-            this.#form.reset();
-            this.#message.remove();
-        });
     }
 }

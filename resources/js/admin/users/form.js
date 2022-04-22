@@ -3,7 +3,11 @@ import {AppFormMessageSettings} from "../../core/AppFormMessage/AppFormMessageSe
 import {AppModalSettings} from "../../core/AppModal/AppModalSettings";
 import {AppForm} from "../../core/AppForm/AppForm";
 
-(function () {
+/**
+ *
+ * @returns {AppForm}
+ */
+export function defineForm() {
     const form = document.getElementById('user-form');
     const settings = new AppFormSettings();
     settings.form = form;
@@ -20,4 +24,6 @@ import {AppForm} from "../../core/AppForm/AppForm";
     const formHandler = new AppForm(settings);
     formHandler.addInvalidFieldEventHandler();
     formHandler.addSubmitEventHandler();
-})()
+
+    return formHandler;
+}

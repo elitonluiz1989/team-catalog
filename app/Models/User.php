@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Hash;
  * @property string $email
  * @property string $password
  * @method static LengthAwarePaginator paginate(int $perPage = 15, array $columns = ['*'], string $pageName = 'page', int|null $page = null)
+ * @method static User find(int|string $id, array $columns = ['*'])
  */
 class User extends Authenticatable
 {

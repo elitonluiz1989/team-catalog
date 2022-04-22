@@ -1,29 +1,49 @@
 import axios, { AxiosRequestConfig } from "axios";
 
 import {AppResponse} from "./AppResponse";
-import {isNullOrUndefined} from "../Helpers";
+import {isNullOrUndefined} from "../helpers";
 
 export class AppRequest {
     /**
      *
      * @type {AxiosRequestConfig}
      */
-    #requestConfig;
+    #requestConfig = {
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    };
 
     /**
      *
-     * @param {AppRequestSettings} settings
+     * @param {?AppRequestSettings} settings
      */
-    constructor(settings) {
-        // noinspection JSValidateTypes
-        this.#requestConfig = {
-            url: settings.url,
-            method: settings.method,
-            data: settings.data,
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest'
-            }
+    constructor(settings = null) {
+        if (settings) {
+            this.#requestConfig.url =  settings.url;
+            this.#requestConfig.method = settings.method;
+            this.#requestConfig.data = settings.data;
         }
+    }
+
+    /**
+     *
+     * @param {string} url
+     * @returns {AppRequest}
+     */
+    url(url) {
+        this.#requestConfig.url = url;
+        return this;
+    }
+
+    /**
+     *
+     * @param {string} method
+     * @returns {AppRequest}
+     */
+    method(method) {
+        this.#requestConfig.method = method;
+        return this;
     }
 
     /**

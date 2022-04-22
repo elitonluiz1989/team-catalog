@@ -1,3 +1,5 @@
+import {AppModalEventsDto} from "./AppModalEventsDto";
+
 export class AppModal {
     /**
      *
@@ -19,12 +21,23 @@ export class AppModal {
 
     /**
      *
+     * @type {AppModalEventsDto}
+     */
+    #events;
+
+    /**
+     *
      * @param {AppModalSettings} settings
      */
     constructor(settings) {
         this.#modal = document.querySelector(settings.modalSelector);
         this.#openerButton = document.querySelector(settings.openerButtonSelector);
         this.#dismissButton = document.querySelector(settings.dismissButtonSelector);
+        this.#events = new AppModalEventsDto();
+
+        if (settings.events instanceof AppModalEventsDto) {
+            this.#events = settings.events;
+        }
     }
 
     open() {
@@ -35,7 +48,31 @@ export class AppModal {
         this.#dismissButton?.click();
     }
 
-    afterClose(callback) {
-        this.#modal?.addEventListener('hidden.bs.modal', callback);
+    /**
+     *
+     * @param {Function} callback
+     */
+    addOnOpenEvent(callback) {
+        this.#events.onOpen = callback;
+        this.#modal?.addEventListener('show.bs.modal', this.#events.onOpen);
+    }
+
+    removeOnOpenEvent() {
+        this.#modal?.removeEventListener('show.bs.modal', this.#events.onOpen);
+        this.#events.onOpen = null;
+    }
+
+    /**
+     *
+     * @param {Function} callback
+     */
+    addAfterCloseEvent(callback) {
+        this.#events.afterClose = callback;
+        this.#modal?.addEventListener('hidden.bs.modal', this.#events.afterClose);
+    }
+
+    removeAfterCloseEvent() {
+        this.#modal?.removeEventListener('hidden.bs.modal', this.#events.afterClose);
+        this.#events.afterClose = null;
     }
 }

@@ -1,3 +1,5 @@
+import {Selector} from "./Selector";
+
 /**
  *
  * @param {number} milliseconds
@@ -36,4 +38,13 @@ export function randId() {
     const secondPart = performance.now().toString().replace('.', '');
 
     return `${firstPart}${secondPart}`;
+}
+
+/**
+ *
+ * @param {string} selector
+ * @returns {Selector}
+ */
+export function selector(selector) {
+    return new Selector(selector);
 }

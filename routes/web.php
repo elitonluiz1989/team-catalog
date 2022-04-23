@@ -28,6 +28,7 @@ Route::namespace('App\Http\Controllers\Admin')
                         Route::get('/{id}', 'UsersController@find')->name('users.find');
                         Route::post('/', 'UsersController@store')->name('users.store');
                         Route::put('/{id}', 'UsersController@update')->name('users.update');
+                        Route::delete('/{id}', 'UsersController@delete')->name('users.delete');
                     });
             });
     });

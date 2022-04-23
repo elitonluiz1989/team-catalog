@@ -68,4 +68,39 @@ import HttpVerbsEnum from "../../core/AppRequest/HttpVerbsEnum";
 
             await mask.hide();
         });
+
+    selector('.user__remove-action')
+        .on('click', async evt => {
+            const dto = getEventTargetHandled(evt, getButtonEventTarget)
+
+            disableAllButtons(dto.parent);
+
+            try {
+                const result = confirm('Are you sure to remove this user?');
+
+                if (result) {
+                    await mask.show();
+
+                    const route = dto.element.data('actionRoute');
+                    const response = await AppRequestStatic.delete(route);
+
+                    await mask.hide();
+
+                    if (response.hasErrors) {
+                        const message = objectArrayToString(response.errors, 'content');
+                        throw new Error(message);
+                    }
+
+                    alert(response.data);
+
+                    window.location.reload();
+                }
+            } catch (error) {
+                await mask.hide();
+
+                alert(error.message);
+            }
+
+            disableAllButtons(dto.parent, false);
+        });
 })()

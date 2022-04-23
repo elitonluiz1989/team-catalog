@@ -28,9 +28,8 @@
                         </button>
 
                         <button
-                            id="remove-user-btn"
-                            class="btn btn-outline-secondary" @disabled($user->id === $currentUserId)
-                            data-user-id="{{ $user->id }}">
+                            class="user__remove-action btn btn-outline-secondary" @disabled($user->id === $currentUserId)
+                            data-action-route="{{ route('users.delete', $user->id) }}">
                             <i class="fas fa-trash"></i>
                         </button>
                     </div>

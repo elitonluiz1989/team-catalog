@@ -53,4 +53,15 @@ class UsersController extends Controller
 
         return 'User was saved.';
     }
+
+    public function delete($id): string {
+        $user = User::find($id);
+        $isDeleted = $user->delete();
+
+        if (!$isDeleted) {
+            abort(404, 'User was not deleted.');
+        }
+
+        return 'User was deleted.';
+    }
 }

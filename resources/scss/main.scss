@@ -1,0 +1,54 @@
+body {
+  background-color: $color-quill-gray;
+}
+
+.header {
+  height: fit-content;
+  background-color: $color-baltic-sea;
+
+  %header-default-color {
+    color: $color-saffron !important;
+  }
+
+  &__title {
+    a {
+      @extend %header-default-color;
+    }
+  }
+
+  &__toggler {
+    border-color: $color-saffron;
+    @extend %header-default-color;
+  }
+
+  .navbar-collapse a {
+    @extend %header-default-color;
+  }
+}
+
+.page-title {
+  background-color: $color-saffron;
+  border-bottom: 1px solid $color-baltic-sea;
+}
+
+.mask {
+    top: 0;
+    left: 0;
+    z-index: 99998;
+    background-color: #333;
+
+    &__content {
+        background-color: transparent;
+        top: 0;
+        left: 0;
+        z-index: 99999;
+
+        .spinner-border {
+            color: $color-saffron;
+        }
+    }
+
+    &.show {
+        opacity: 0.5;
+    }
+}

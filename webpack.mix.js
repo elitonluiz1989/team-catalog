@@ -12,6 +12,12 @@ const mix = require('laravel-mix');
  */
 
 mix.js('resources/js/app.js', 'public/js')
-    .postCss('resources/css/app.css', 'public/css', [
-        //
-    ]);
+    .sass('resources/scss/app.scss', 'public/css')
+    .browserSync({
+        proxy : 'team-catalog.php',
+        host: 'localhost',
+        open: false,
+        port: 8080,
+        logConnections: true,
+        logLevel: 'debug',
+    });

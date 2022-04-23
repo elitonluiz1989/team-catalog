@@ -1,0 +1,29 @@
+.user {
+  height: 13rem;
+  background-color: white;
+  box-shadow: 1px 1px 5px #999;
+  border-radius: 0.5rem;
+
+  &--add .fas {
+    color: #999;
+    font-size: 5rem;
+  }
+
+  &-form {
+    background-color: #fafafa;
+    box-shadow: 1px 1px 5px #999;
+    border-radius: 00.5rem;
+
+    &__title {
+      border-bottom: 0.1rem solid #444;
+    }
+  }
+
+  &__item {
+    height: fit-content;
+
+    &--bordered {
+      border-bottom: 1px solid #999;
+    }
+  }
+}

@@ -1,1 +1,3 @@
-require('./bootstrap');
+import 'bootstrap/dist/js/bootstrap';
+
+import './admin/users';

@@ -16,7 +16,7 @@ export class AppRequest {
 
     /**
      *
-     * @param {?AppRequestSettings} settings
+     * @param {?AppRequestDto} settings
      */
     constructor(settings = null) {
         if (settings) {

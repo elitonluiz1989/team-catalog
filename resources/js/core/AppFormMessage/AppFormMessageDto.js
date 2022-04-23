@@ -1,4 +1,4 @@
-export class AppFormMessageSettings {
+export class AppFormMessageDto {
     /**
      *
      * @param {?HTMLFormElement} form

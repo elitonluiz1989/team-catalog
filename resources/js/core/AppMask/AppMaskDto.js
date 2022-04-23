@@ -1,4 +1,4 @@
-export class AppMaskSettings {
+export class AppMaskDto {
     /**
      *
      * @param {?string} maskId

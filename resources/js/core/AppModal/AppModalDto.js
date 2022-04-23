@@ -1,4 +1,4 @@
-export class AppModalSettings {
+export class AppModalDto {
     /**
      *
      * @param {?string} modalSelector

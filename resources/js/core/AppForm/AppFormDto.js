@@ -1,11 +1,11 @@
-export class AppFormSettings {
+export class AppFormDto {
     /**
      *
      * @param {?HTMLFormElement} form
-     * @param {?AppFormMessageSettings} message
-     * @param {?AppRequestSettings} request
-     * @param {?AppModalSettings} modal
-     * @param {?AppMaskSettings} mask
+     * @param {?AppFormMessageDto} message
+     * @param {?AppRequestDto} request
+     * @param {?AppModalDto} modal
+     * @param {?AppMaskDto} mask
      */
     constructor(
         form = null,

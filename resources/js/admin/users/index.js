@@ -1,4 +1,4 @@
-import {AppMaskSettings} from "../../core/AppMask/AppMaskSettings";
+import {AppMaskDto} from "../../core/AppMask/AppMaskDto";
 import {AppMask} from "../../core/AppMask/AppMask";
 import {getEventTargetHandled, objectArrayToString, selector} from "../../core/helpers";
 import {AppRequestStatic} from "../../core/AppRequest/AppRequestStatic";
@@ -12,9 +12,9 @@ import HttpVerbsEnum from "../../core/AppRequest/HttpVerbsEnum";
 
 (function() {
     const form = defineForm();
-    const maskSettings = new AppMaskSettings();
-    maskSettings.withLoading = true;
-    const mask = new AppMask(maskSettings);
+    const maskDto = new AppMaskDto();
+    maskDto.withLoading = true;
+    const mask = new AppMask(maskDto);
     /**
      *
      * @param {Selector} container

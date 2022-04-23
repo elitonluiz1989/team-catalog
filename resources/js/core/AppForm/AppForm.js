@@ -2,9 +2,9 @@ import {AppModal} from "../AppModal/AppModal";
 import {AppFormMessage} from "../AppFormMessage/AppFormMessage";
 import {AppRequest} from "../AppRequest/AppRequest";
 import {delay} from "../helpers";
-import {AppRequestSettings} from "../AppRequest/AppRequestSettings";
+import {AppRequestDto} from "../AppRequest/AppRequestDto";
 import {AppMask} from "../AppMask/AppMask";
-import {AppMaskSettings} from "../AppMask/AppMaskSettings";
+import {AppMaskDto} from "../AppMask/AppMaskDto";
 
 export class AppForm {
     /**
@@ -57,13 +57,13 @@ export class AppForm {
 
     /**
      *
-     * @param {AppFormSettings} settings
+     * @param {AppFormDto} settings
      */
     constructor(settings) {
         this.#form = settings.form;
 
         if (!settings.request) {
-            settings.request = new AppRequestSettings(
+            settings.request = new AppRequestDto(
                 this.#form.action,
                 this.#form.method
             )
@@ -80,7 +80,7 @@ export class AppForm {
         }
 
         if (!settings.mask) {
-            settings.mask = new AppMaskSettings();
+            settings.mask = new AppMaskDto();
             settings.mask.withLoading = true;
         }
 

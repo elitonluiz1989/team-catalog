@@ -27,7 +27,7 @@ export class AppMask {
 
     /**
      *
-     * @param {?AppMaskSettings} settings
+     * @param {?AppMaskDto} settings
      */
     constructor(settings = null) {
         this.#maskId = settings.maskId ?? this.#createRandomId('app-mask');

@@ -1,6 +1,6 @@
-import {AppFormSettings} from "../../core/AppForm/AppFormSettings";
-import {AppFormMessageSettings} from "../../core/AppFormMessage/AppFormMessageSettings";
-import {AppModalSettings} from "../../core/AppModal/AppModalSettings";
+import {AppFormDto} from "../../core/AppForm/AppFormDto";
+import {AppFormMessageDto} from "../../core/AppFormMessage/AppFormMessageDto";
+import {AppModalDto} from "../../core/AppModal/AppModalDto";
 import {AppForm} from "../../core/AppForm/AppForm";
 
 /**
@@ -9,13 +9,13 @@ import {AppForm} from "../../core/AppForm/AppForm";
  */
 export function defineForm() {
     const form = document.getElementById('user-form');
-    const settings = new AppFormSettings();
+    const settings = new AppFormDto();
     settings.form = form;
 
-    settings.message = new AppFormMessageSettings();
+    settings.message = new AppFormMessageDto();
     settings.message.container = '#user-form-messages';
 
-    settings.modal = new AppModalSettings(
+    settings.modal = new AppModalDto(
         '#user-store-modal',
         '#user-store-modal-opener-btn',
         '#user-store-modal-dismiss-btn'

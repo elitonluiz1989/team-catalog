@@ -1,9 +1,9 @@
-export class AppRequestSettings {
+export class AppRequestDto {
     /**
      *
      * @param {?string} url
      * @param {?string} method
-     * @param {*} data
+     * @param {any} data
      */
     constructor(
         url = null,

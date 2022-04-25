@@ -20,7 +20,7 @@ export class AppFormMessage {
 
     /**
      *
-     * @param {AppFormMessageSettings} settings
+     * @param {AppFormMessageDto} settings
      */
     constructor(settings) {
         this.#form = settings.form;

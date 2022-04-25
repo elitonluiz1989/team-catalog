@@ -1,10 +1,11 @@
 import {AppModal} from "../AppModal/AppModal";
 import {AppFormMessage} from "../AppFormMessage/AppFormMessage";
 import {AppRequest} from "../AppRequest/AppRequest";
-import {delay} from "../helpers";
+import {delay, isFunction} from "../helpers";
 import {AppRequestDto} from "../AppRequest/AppRequestDto";
 import {AppMask} from "../AppMask/AppMask";
 import {AppMaskDto} from "../AppMask/AppMaskDto";
+import {AppFormMessageDto} from "../AppFormMessage/AppFormMessageDto";
 
 export class AppForm {
     /**
@@ -62,6 +63,10 @@ export class AppForm {
     constructor(settings) {
         this.#form = settings.form;
 
+        if (!this.#form) {
+            throw new Error('Form not defined.');
+        }
+
         if (!settings.request) {
             settings.request = new AppRequestDto(
                 this.#form.action,
@@ -70,6 +75,10 @@ export class AppForm {
         }
 
         this.#request = new AppRequest(settings.request);
+
+        if (!settings.message) {
+            settings.message = new AppFormMessageDto();
+        }
 
         settings.message.form = this.#form;
         this.#message = new AppFormMessage(settings.message);
@@ -203,13 +212,9 @@ export class AppForm {
     }
 
     addInvalidFieldEventHandler() {
-        this.#form.querySelectorAll('input').forEach(function(item) {
-            item.addEventListener('keydown', function(evt) {
-                const target = evt?.target;
-
-                if (target && target.classList.contains('is-invalid')) {
-                    target.classList.remove('is-invalid');
-                }
+        this.#iterateFormFields(item => {
+            item.addEventListener('keydown', evt => {
+                this.#removeInvalidTagFromField(evt.target);
             });
         });
     }
@@ -233,13 +238,19 @@ export class AppForm {
                 this.#form.reset();
                 this.#recordIdentifier?.remove();
 
-                for (const field of this.#disabledFields) {
-                    this.enableField(field);
-                }
+                let disabledFieldName = '';
+                this.#iterateFormFields(item => {
+                    disabledFieldName = this.#disabledFields.find(fieldName => item.getAttribute('name') === fieldName);
+                    if (disabledFieldName) {
+                        this.enableField(disabledFieldName);
+                    }
+
+                    this.#removeInvalidTagFromField(item);
+                })
 
                 this.#message.remove();
 
-                if (callback instanceof Function) {
+                if (isFunction(callback)) {
                     callback(this);
                 }
             });
@@ -248,20 +259,51 @@ export class AppForm {
 
     /**
      *
+     * @returns {HTMLFormElement}
+     */
+    get form() {
+        return this.#form;
+    }
+
+    /**
+     *
      * @returns {object}
      */
     #getFormData() {
         const formData = {};
-        const elements = this.#form.querySelectorAll('input,select,textarea');
 
-        for (const element of elements) {
-            if (this.#removeDisabledFieldsOnSubmit && element.getAttribute('disabled')) {
-                continue;
+        this.#iterateFormFields(field => {
+            if (this.#removeDisabledFieldsOnSubmit && field.getAttribute('disabled')) {
+                return;
             }
 
-            formData[element.getAttribute('name')] = element.value;
-        }
+            formData[field.getAttribute('name')] = field.value;
+        });
 
         return formData;
+    }
+
+    /**
+     *
+     * @param {Function} callback
+     */
+    #iterateFormFields(callback) {
+        if (!isFunction(callback)) {
+            return;
+        }
+
+        this.#form.querySelectorAll('input, select, textarea').forEach(item => {
+            callback(item);
+        });
+    }
+
+    /**
+     *
+     * @param {HTMLElement} field
+     */
+    #removeInvalidTagFromField(field) {
+        if (field && field.classList.contains('is-invalid')) {
+            field.classList.remove('is-invalid');
+        }
     }
 }

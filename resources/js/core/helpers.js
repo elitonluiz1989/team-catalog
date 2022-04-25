@@ -1,5 +1,6 @@
-import {Selector} from "./Selector";
+import {AppCore} from "./AppCore";
 import {EventTargetDto} from "./DTO/EventTargetDto";
+import {Selector} from "./Selector";
 
 /**
  *
@@ -19,6 +20,36 @@ export function delay(milliseconds){
  */
 export function isNullOrUndefined(value) {
     return value === undefined || value === null;
+}
+
+/**
+ *
+ * @param {any} value
+ * @returns {boolean}
+ */
+export function isNullOrEmpty(value) {
+    if (isNullOrUndefined(value)) {
+        return true;
+    }
+
+    if (!value.length) {
+        return true;
+    }
+
+    return value.length === 0;
+}
+
+/**
+ *
+ * @param {any} value
+ * @returns {boolean}
+ */
+export function isNullOrWhiteSpace(value) {
+    if (isNullOrEmpty(value)) {
+        return true;
+    }
+
+    return value.toString().trim() === '';
 }
 
 /**
@@ -74,7 +105,9 @@ export function objectArrayToString(arr, property) {
  * @returns {boolean}
  */
 export function isFunction(func) {
-    return func instanceof Function;
+    return func instanceof Function ||
+        typeof func === 'function' ||
+        Object.prototype.toString.call(func) === '[object Function]';
 }
 
 /**
@@ -93,3 +126,6 @@ export function getEventTargetHandled(evt, targetHandleCallback = null) {
     return result;
 }
 
+export function createApp(components) {
+    return new AppCore(components);
+}

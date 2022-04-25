@@ -27,7 +27,7 @@ export class AppModal {
 
     /**
      *
-     * @param {AppModalSettings} settings
+     * @param {AppModalDto} settings
      */
     constructor(settings) {
         this.#modal = document.querySelector(settings.modalSelector);

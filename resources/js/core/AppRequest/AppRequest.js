@@ -1,7 +1,74 @@
 import axios, { AxiosRequestConfig } from "axios";
 
+import {isNullOrUndefined, isNullOrWhiteSpace} from "../helpers";
+
 import {AppResponse} from "./AppResponse";
-import {isNullOrUndefined} from "../helpers";
+
+export class AppRequestRoute {
+    /**
+     *
+     * @type {string}
+     */
+    #origin;
+
+    /**
+     *
+     * @type {string}
+     */
+    #route;
+
+    /**
+     *
+     * @type {string[]}
+     */
+    #routeComposition = [];
+
+    constructor() {
+        this.fill();
+    }
+
+    /**
+     *
+     * @returns {string}
+     */
+    get route() {
+        return this.#route;
+    }
+
+    /**
+     *
+     * @returns {string}
+     */
+    get fullRoute() {
+        return `${this.#origin}/${this.#route}`;
+    }
+
+    /**
+     *
+     * @returns {string[]}
+     */
+    get routeComposition() {
+        return this.#routeComposition;
+    }
+
+    /**
+     *
+     * @returns {string}
+     */
+    get routeIdentifier() {
+        if (this.#routeComposition.length === 0) {
+            return '';
+        }
+
+        return this.#routeComposition[0];
+    }
+
+    fill() {
+        this.#origin = window.location.origin;
+        this.#route = window.location.pathname;
+        this.#routeComposition = this.#route.split('/').filter(item => !isNullOrWhiteSpace(item));
+    }
+}
 
 export class AppRequest {
     /**
@@ -16,6 +83,12 @@ export class AppRequest {
 
     /**
      *
+     * @type {AppRequestRoute}
+     */
+    #route;
+
+    /**
+     *
      * @param {?AppRequestDto} settings
      */
     constructor(settings = null) {
@@ -24,6 +97,8 @@ export class AppRequest {
             this.#requestConfig.method = settings.method;
             this.#requestConfig.data = settings.data;
         }
+
+        this.#route = new AppRequestRoute();
     }
 
     /**
@@ -86,5 +161,17 @@ export class AppRequest {
      */
     get hasData() {
         return !isNullOrUndefined(this.#requestConfig.data);
+    }
+
+    updateRouteContent() {
+        this.#route.fill();
+    }
+
+    /**
+     *
+     * @returns {AppRequestRoute}
+     */
+    get route() {
+        return this.#route;
     }
 }

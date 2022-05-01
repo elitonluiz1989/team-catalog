@@ -1,4 +1,4 @@
-import {createEnum} from "../helpers";
+import {createEnum} from "../../helpers";
 
 export default createEnum({
     GET: 'get',

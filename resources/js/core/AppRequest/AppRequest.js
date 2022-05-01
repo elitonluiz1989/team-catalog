@@ -1,74 +1,9 @@
 import axios, { AxiosRequestConfig } from "axios";
 
-import {isNullOrUndefined, isNullOrWhiteSpace} from "../helpers";
+import {isNullOrUndefined} from "../helpers";
 
 import {AppResponse} from "./AppResponse";
-
-export class AppRequestRoute {
-    /**
-     *
-     * @type {string}
-     */
-    #origin;
-
-    /**
-     *
-     * @type {string}
-     */
-    #route;
-
-    /**
-     *
-     * @type {string[]}
-     */
-    #routeComposition = [];
-
-    constructor() {
-        this.fill();
-    }
-
-    /**
-     *
-     * @returns {string}
-     */
-    get route() {
-        return this.#route;
-    }
-
-    /**
-     *
-     * @returns {string}
-     */
-    get fullRoute() {
-        return `${this.#origin}/${this.#route}`;
-    }
-
-    /**
-     *
-     * @returns {string[]}
-     */
-    get routeComposition() {
-        return this.#routeComposition;
-    }
-
-    /**
-     *
-     * @returns {string}
-     */
-    get routeIdentifier() {
-        if (this.#routeComposition.length === 0) {
-            return '';
-        }
-
-        return this.#routeComposition[0];
-    }
-
-    fill() {
-        this.#origin = window.location.origin;
-        this.#route = window.location.pathname;
-        this.#routeComposition = this.#route.split('/').filter(item => !isNullOrWhiteSpace(item));
-    }
-}
+import {AppRequestRoute} from "./AppRequestRoute";
 
 export class AppRequest {
     /**

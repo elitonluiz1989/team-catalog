@@ -1,4 +1,4 @@
-import {AppModalEventsDto} from "./AppModalEventsDto";
+import {AppModalEventsDto} from "./Dtos/AppModalEventsDto";
 
 export class AppModal {
     /**

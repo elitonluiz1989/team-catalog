@@ -1,5 +1,5 @@
 import {AppCore} from "./AppCore";
-import {EventTargetDto} from "./DTO/EventTargetDto";
+import {EventTargetDto} from "./Dtos/EventTargetDto";
 import {Selector} from "./Selector";
 
 /**

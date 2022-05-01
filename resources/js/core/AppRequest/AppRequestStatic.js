@@ -1,5 +1,5 @@
 import {AppRequest} from "./AppRequest";
-import HttpVerbsEnum from "./HttpVerbsEnum";
+import HttpVerbsEnum from "./Enums/HttpVerbsEnum";
 
 export class AppRequestStatic {
     static #request = new AppRequest();

@@ -1,11 +1,11 @@
-import {AppModal} from "../AppModal/AppModal";
 import {AppFormMessage} from "../AppFormMessage/AppFormMessage";
-import {AppRequest} from "../AppRequest/AppRequest";
-import {delay, isFunction} from "../helpers";
-import {AppRequestDto} from "../AppRequest/AppRequestDto";
+import {AppFormMessageDto} from "../AppFormMessage/Dtos/AppFormMessageDto";
 import {AppMask} from "../AppMask/AppMask";
-import {AppMaskDto} from "../AppMask/AppMaskDto";
-import {AppFormMessageDto} from "../AppFormMessage/AppFormMessageDto";
+import {AppModal} from "../AppModal/AppModal";
+import {AppMaskDto} from "../AppMask/Dtos/AppMaskDto";
+import {AppRequest} from "../AppRequest/AppRequest";
+import {AppRequestDto} from "../AppRequest/Dtos/AppRequestDto";
+import {delay, isFunction} from "../helpers";
 
 export class AppForm {
     /**
@@ -84,8 +84,7 @@ export class AppForm {
         this.#message = new AppFormMessage(settings.message);
 
         if (settings.modal) {
-            this.#modal = new AppModal(settings.modal);
-            this.onFormModalClose();
+            this.setModal(settings.modal);
         }
 
         if (!settings.mask) {
@@ -126,6 +125,11 @@ export class AppForm {
             this.#form.setAttribute('method', method);
             this.#request.method(method);
         }
+    }
+
+    setModal(dto) {
+        this.#modal = new AppModal(dto);
+        this.onFormModalClose();
     }
 
     /**

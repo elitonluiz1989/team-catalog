@@ -16,7 +16,7 @@ export class AppCore {
     }
 
     run() {
-        const currentRoute = AppRequestStatic.route.routeIdentifier;
+        const currentRoute = AppRequestStatic.route.path;
         const component = this.#components.find(c => c.route === currentRoute);
 
         if (!component) {

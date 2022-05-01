@@ -44,14 +44,10 @@ export class AdminBaseComponent extends AppCoreComponent {
         this.#appForm.addSubmitEventHandler();
     }
 
-    configureMask() {
+    configureAppMask() {
         const maskDto = new AppMaskDto();
         maskDto.withLoading = true;
         this.#mask = new AppMask(maskDto);
-    }
-
-    addCreateEvent() {
-        throw new Error("Not implemented.");
     }
 
     get appForm() {
@@ -129,8 +125,6 @@ export class AdminBaseComponent extends AppCoreComponent {
 
                         const route = eventTargetDto.element.data(dto.actionRouteKey);
                         const response = await AppRequestStatic.delete(route);
-
-                        await this.#mask.hide();
 
                         if (response.hasErrors) {
                             const message = objectArrayToString(response.errors, 'content');

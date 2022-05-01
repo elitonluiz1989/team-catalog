@@ -82,6 +82,10 @@ export class AppRequest {
         this.#requestConfig.data = data;
     }
 
+    clearData() {
+        this.#requestConfig.data = null;
+    }
+
     /**
      *
      * @returns {any}

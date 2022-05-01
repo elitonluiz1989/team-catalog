@@ -20,7 +20,7 @@ export class UserComponent extends AdminBaseComponent {
             '#user-form-messages',
             appModalDto
         );
-        this.configureMask();
+        this.configureAppMask();
 
         /**
          *

@@ -200,6 +200,8 @@ export class AppForm {
 
         if (response.hasErrors) {
             this.#message.errors(response.errors);
+            this.#request.clearData();
+
             return;
         }
 
@@ -207,10 +209,12 @@ export class AppForm {
 
         await delay(2000);
 
+        await this.#modal.close();
+
+        await this.#mask.show();
+
         this.#form.reset();
         this.#message.remove();
-
-        await this.#modal.close();
 
         window.location.reload();
     }
@@ -219,7 +223,11 @@ export class AppForm {
         this.#iterateFormFields(item => {
             item.addEventListener('keydown', evt => {
                 this.#removeInvalidTagFromField(evt.target);
-            });
+            }, false);
+
+            item.addEventListener('change', evt => {
+                this.#removeInvalidTagFromField(evt.target);
+            }, false);
         });
     }
 
@@ -227,7 +235,7 @@ export class AppForm {
         this.#form.addEventListener('submit', async (evt) => {
             evt?.preventDefault();
             await this.submit();
-        });
+        }, false);
     }
 
     /**

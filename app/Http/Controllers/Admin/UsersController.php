@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Admin\User\UserStoreRequest;
+use App\Http\Requests\Admin\User\UserCreateRequest;
 use App\Http\Requests\Admin\User\UserUpdateRequest;
 use App\Models\User;
 use Illuminate\Contracts\View\Factory;
@@ -30,7 +30,7 @@ class UsersController extends Controller
         return $user;
     }
 
-    public function store(UserStoreRequest $request): string {
+    public function create(UserCreateRequest $request): string {
         $user = new User();
         $user->fill($request->input());
         $isSaved = $user->save();

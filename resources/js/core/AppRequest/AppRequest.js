@@ -1,7 +1,9 @@
 import axios, { AxiosRequestConfig } from "axios";
 
-import {AppResponse} from "./AppResponse";
 import {isNullOrUndefined} from "../helpers";
+
+import {AppResponse} from "./AppResponse";
+import {AppRequestRoute} from "./AppRequestRoute";
 
 export class AppRequest {
     /**
@@ -16,6 +18,12 @@ export class AppRequest {
 
     /**
      *
+     * @type {AppRequestRoute}
+     */
+    #route;
+
+    /**
+     *
      * @param {?AppRequestDto} settings
      */
     constructor(settings = null) {
@@ -24,6 +32,8 @@ export class AppRequest {
             this.#requestConfig.method = settings.method;
             this.#requestConfig.data = settings.data;
         }
+
+        this.#route = new AppRequestRoute();
     }
 
     /**
@@ -72,6 +82,10 @@ export class AppRequest {
         this.#requestConfig.data = data;
     }
 
+    clearData() {
+        this.#requestConfig.data = null;
+    }
+
     /**
      *
      * @returns {any}
@@ -86,5 +100,17 @@ export class AppRequest {
      */
     get hasData() {
         return !isNullOrUndefined(this.#requestConfig.data);
+    }
+
+    updateRouteContent() {
+        this.#route.fill();
+    }
+
+    /**
+     *
+     * @returns {AppRequestRoute}
+     */
+    get route() {
+        return this.#route;
     }
 }

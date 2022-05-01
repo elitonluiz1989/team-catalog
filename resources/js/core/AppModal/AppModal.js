@@ -1,4 +1,4 @@
-import {AppModalEventsDto} from "./AppModalEventsDto";
+import {AppModalEventsDto} from "./Dtos/AppModalEventsDto";
 
 export class AppModal {
     /**
@@ -27,7 +27,7 @@ export class AppModal {
 
     /**
      *
-     * @param {AppModalSettings} settings
+     * @param {AppModalDto} settings
      */
     constructor(settings) {
         this.#modal = document.querySelector(settings.modalSelector);

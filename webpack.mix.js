@@ -13,11 +13,9 @@ const mix = require('laravel-mix');
 
 mix.js('resources/js/app.js', 'public/js')
     .sass('resources/scss/app.scss', 'public/css')
+    .sourceMaps()
     .browserSync({
-        proxy : 'team-catalog.php',
+        proxy : 'localhost:8000',
         host: 'localhost',
-        open: false,
-        port: 8080,
-        logConnections: true,
-        logLevel: 'debug',
+        open: false
     });

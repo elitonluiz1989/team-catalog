@@ -1,106 +1,56 @@
-import {AppMaskDto} from "../../core/AppMask/AppMaskDto";
-import {AppMask} from "../../core/AppMask/AppMask";
-import {getEventTargetHandled, objectArrayToString, selector} from "../../core/helpers";
-import {AppRequestStatic} from "../../core/AppRequest/AppRequestStatic";
-import {Selector} from "../../core/Selector";
+import {AppModalDto} from "../../core/AppModal/Dtos/AppModalDto";
 
-import {getButtonEventTarget} from "../../helpers";
+import {AdminBaseComponent} from "../commom/AdminBaseComponent";
+import {AdminEditEventDto} from "../commom/Dtos/AdminEditEventDto";
+import {AdminRemoveEventDto} from "../commom/Dtos/AdminRemoveEventDto";
 
 import {User} from "./User";
-import {defineForm} from "./form";
-import HttpVerbsEnum from "../../core/AppRequest/HttpVerbsEnum";
 
-(function() {
-    const form = defineForm();
-    const maskDto = new AppMaskDto();
-    maskDto.withLoading = true;
-    const mask = new AppMask(maskDto);
-    /**
-     *
-     * @param {Selector} container
-     * @param {Boolean} disable
-     */
-    const disableAllButtons = (container, disable = true) => {
-        container.iterateChildren(child => {
-            if (child instanceof HTMLButtonElement) {
-                selector(child).disable(disable);
-            }
-        });
+export class UserComponent extends AdminBaseComponent {
+    route = '/users';
+
+    run() {
+        const appModalDto = new AppModalDto(
+            '#user-form-modal',
+            '#user-form-modal-opener-btn',
+            '#user-form-modal-dismiss-btn'
+        );
+        this.configureAppForm(
+            '#user-form',
+            '#user-form-messages',
+            appModalDto
+        );
+        this.configureAppMask();
+
+        /**
+         *
+         * @param {AppForm} form
+         * @param {any} data
+         */
+        const fillForm = (form, data) => {
+            const user = new User();
+            user.fill(data);
+
+            form.fill(user);
+            form.createRecordIdentifier('id', user.id);
+            form.disableFields('email', 'password');
+            form.removeDisabledFieldsOnSubmit()
+        };
+        const adminRecordEditEventDto = new AdminEditEventDto(
+            '.user__edit-action',
+            'findRoute',
+            'actionRoute',
+            fillForm
+        );
+
+        this.addEditEvent(adminRecordEditEventDto);
+
+        const adminRemoveEventDto = new AdminRemoveEventDto(
+            '.user__remove-action',
+            'actionRoute',
+            'Are you sure to remove this user?'
+        );
+
+        this.addRemoveEvent(adminRemoveEventDto);
     }
-
-    selector('.user__edit-action')
-        .on('click', async evt => {
-            await mask.show();
-
-            const dto = getEventTargetHandled(evt, getButtonEventTarget);
-
-            disableAllButtons(dto.parent);
-
-            form.onFormModalClose(() => disableAllButtons(dto.parent, false));
-
-            try {
-                const findRoute = dto.element.data('findRoute');
-                const route = dto.element.data('actionRoute');
-
-                if (!findRoute || !route) {
-                    throw new Error('User edit route is not defined.');
-                }
-
-                const response = await AppRequestStatic.get(findRoute);
-
-                if (response.hasErrors) {
-                    const message = objectArrayToString(response.errors, 'content');
-                    throw new Error(message);
-                }
-
-                const user = new User();
-                user.fill(response.data);
-
-                form.fill(user);
-                form.setRoute(route, HttpVerbsEnum.PUT);
-                form.createRecordIdentifier('id', user.id);
-                form.disableFields('email', 'password');
-                form.removeDisabledFieldsOnSubmit()
-                form.open();
-            } catch (error) {
-                alert(error.message);
-            }
-
-            await mask.hide();
-        });
-
-    selector('.user__remove-action')
-        .on('click', async evt => {
-            const dto = getEventTargetHandled(evt, getButtonEventTarget)
-
-            disableAllButtons(dto.parent);
-
-            try {
-                const result = confirm('Are you sure to remove this user?');
-
-                if (result) {
-                    await mask.show();
-
-                    const route = dto.element.data('actionRoute');
-                    const response = await AppRequestStatic.delete(route);
-
-                    await mask.hide();
-
-                    if (response.hasErrors) {
-                        const message = objectArrayToString(response.errors, 'content');
-                        throw new Error(message);
-                    }
-
-                    alert(response.data);
-
-                    window.location.reload();
-                }
-            } catch (error) {
-                await mask.hide();
-
-                alert(error.message);
-            }
-
-            disableAllButtons(dto.parent, false);
-        });
-})()
+}

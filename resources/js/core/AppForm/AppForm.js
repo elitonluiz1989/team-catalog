@@ -1,10 +1,11 @@
-import {AppModal} from "../AppModal/AppModal";
 import {AppFormMessage} from "../AppFormMessage/AppFormMessage";
-import {AppRequest} from "../AppRequest/AppRequest";
-import {delay} from "../helpers";
-import {AppRequestDto} from "../AppRequest/AppRequestDto";
+import {AppFormMessageDto} from "../AppFormMessage/Dtos/AppFormMessageDto";
 import {AppMask} from "../AppMask/AppMask";
-import {AppMaskDto} from "../AppMask/AppMaskDto";
+import {AppModal} from "../AppModal/AppModal";
+import {AppMaskDto} from "../AppMask/Dtos/AppMaskDto";
+import {AppRequest} from "../AppRequest/AppRequest";
+import {AppRequestDto} from "../AppRequest/Dtos/AppRequestDto";
+import {delay, isFunction} from "../helpers";
 
 export class AppForm {
     /**
@@ -62,6 +63,10 @@ export class AppForm {
     constructor(settings) {
         this.#form = settings.form;
 
+        if (!this.#form) {
+            throw new Error('Form not defined.');
+        }
+
         if (!settings.request) {
             settings.request = new AppRequestDto(
                 this.#form.action,
@@ -71,12 +76,15 @@ export class AppForm {
 
         this.#request = new AppRequest(settings.request);
 
+        if (!settings.message) {
+            settings.message = new AppFormMessageDto();
+        }
+
         settings.message.form = this.#form;
         this.#message = new AppFormMessage(settings.message);
 
         if (settings.modal) {
-            this.#modal = new AppModal(settings.modal);
-            this.onFormModalClose();
+            this.setModal(settings.modal);
         }
 
         if (!settings.mask) {
@@ -117,6 +125,11 @@ export class AppForm {
             this.#form.setAttribute('method', method);
             this.#request.method(method);
         }
+    }
+
+    setModal(dto) {
+        this.#modal = new AppModal(dto);
+        this.onFormModalClose();
     }
 
     /**
@@ -187,6 +200,8 @@ export class AppForm {
 
         if (response.hasErrors) {
             this.#message.errors(response.errors);
+            this.#request.clearData();
+
             return;
         }
 
@@ -194,23 +209,25 @@ export class AppForm {
 
         await delay(2000);
 
+        await this.#modal.close();
+
+        await this.#mask.show();
+
         this.#form.reset();
         this.#message.remove();
-
-        await this.#modal.close();
 
         window.location.reload();
     }
 
     addInvalidFieldEventHandler() {
-        this.#form.querySelectorAll('input').forEach(function(item) {
-            item.addEventListener('keydown', function(evt) {
-                const target = evt?.target;
+        this.#iterateFormFields(item => {
+            item.addEventListener('keydown', evt => {
+                this.#removeInvalidTagFromField(evt.target);
+            }, false);
 
-                if (target && target.classList.contains('is-invalid')) {
-                    target.classList.remove('is-invalid');
-                }
-            });
+            item.addEventListener('change', evt => {
+                this.#removeInvalidTagFromField(evt.target);
+            }, false);
         });
     }
 
@@ -218,7 +235,7 @@ export class AppForm {
         this.#form.addEventListener('submit', async (evt) => {
             evt?.preventDefault();
             await this.submit();
-        });
+        }, false);
     }
 
     /**
@@ -233,13 +250,19 @@ export class AppForm {
                 this.#form.reset();
                 this.#recordIdentifier?.remove();
 
-                for (const field of this.#disabledFields) {
-                    this.enableField(field);
-                }
+                let disabledFieldName = '';
+                this.#iterateFormFields(item => {
+                    disabledFieldName = this.#disabledFields.find(fieldName => item.getAttribute('name') === fieldName);
+                    if (disabledFieldName) {
+                        this.enableField(disabledFieldName);
+                    }
+
+                    this.#removeInvalidTagFromField(item);
+                })
 
                 this.#message.remove();
 
-                if (callback instanceof Function) {
+                if (isFunction(callback)) {
                     callback(this);
                 }
             });
@@ -248,20 +271,51 @@ export class AppForm {
 
     /**
      *
+     * @returns {HTMLFormElement}
+     */
+    get form() {
+        return this.#form;
+    }
+
+    /**
+     *
      * @returns {object}
      */
     #getFormData() {
         const formData = {};
-        const elements = this.#form.querySelectorAll('input,select,textarea');
 
-        for (const element of elements) {
-            if (this.#removeDisabledFieldsOnSubmit && element.getAttribute('disabled')) {
-                continue;
+        this.#iterateFormFields(field => {
+            if (this.#removeDisabledFieldsOnSubmit && field.getAttribute('disabled')) {
+                return;
             }
 
-            formData[element.getAttribute('name')] = element.value;
-        }
+            formData[field.getAttribute('name')] = field.value;
+        });
 
         return formData;
+    }
+
+    /**
+     *
+     * @param {Function} callback
+     */
+    #iterateFormFields(callback) {
+        if (!isFunction(callback)) {
+            return;
+        }
+
+        this.#form.querySelectorAll('input, select, textarea').forEach(item => {
+            callback(item);
+        });
+    }
+
+    /**
+     *
+     * @param {HTMLElement} field
+     */
+    #removeInvalidTagFromField(field) {
+        if (field && field.classList.contains('is-invalid')) {
+            field.classList.remove('is-invalid');
+        }
     }
 }

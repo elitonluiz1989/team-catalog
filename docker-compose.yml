@@ -1,19 +1,6 @@
 version: '3'
 
 services:
-  team-catalog.vue:
-    image: elitonluiz1989/vue
-
-    container_name: team-catalog.vue
-
-    ports:
-      - "8080:8080"
-
-    volumes:
-      - .:/app
-
-    working_dir: /app
-
   team-catalog.php:
     image: elitonluiz1989/php
 
@@ -26,6 +13,8 @@ services:
       - .:/app
 
     working_dir: /app
+
+    command: "php artisan serve --host=0.0.0.0 --port=8000"
 
   team-catalog.mysql:
     image: mysql

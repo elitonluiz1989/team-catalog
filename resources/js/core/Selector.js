@@ -34,11 +34,12 @@ export class Selector {
      *
      * @param {string} eventName
      * @param {Function} callback
+     * @param {boolean|AddEventListenerOptions} options
      * @returns {Selector}
      */
-    on(eventName, callback) {
+    on(eventName, callback, options = false) {
         this.#selectors.forEach(selector => {
-            selector.addEventListener(eventName, callback, false);
+            selector.addEventListener(eventName, callback, options);
         })
 
         return this;

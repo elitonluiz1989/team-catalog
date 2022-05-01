@@ -26,9 +26,19 @@ Route::namespace('App\Http\Controllers\Admin')
                     ->group(function() {
                         Route::get('', 'UsersController@index')->name('users.index');
                         Route::get('/{id}', 'UsersController@find')->name('users.find');
-                        Route::post('/', 'UsersController@store')->name('users.store');
+                        Route::post('/', 'UsersController@create')->name('users.create');
                         Route::put('/{id}', 'UsersController@update')->name('users.update');
                         Route::delete('/{id}', 'UsersController@delete')->name('users.delete');
+                    });
+
+                Route::prefix('categories/')
+                    ->group(function() {
+                        Route::get('', 'CategoriesController@index')->name('categories.index');
+                        Route::get('/{id}', 'CategoriesController@find')->name('categories.find');
+                        Route::post('/', 'CategoriesController@create')->name('categories.create');
+                        Route::put('/{id}', 'CategoriesController@update')->name('categories.update');
+                        Route::delete('/{id}', 'CategoriesController@delete')->name('categories.delete');
+                        Route::get('/order/last', 'CategoriesController@lastOrder')->name('categories.order.last');
                     });
             });
     });

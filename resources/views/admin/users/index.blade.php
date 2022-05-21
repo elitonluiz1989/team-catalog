@@ -61,7 +61,6 @@
                 form-method="{{ \App\Enums\HttpMethodsEnum::POST }}">
                 @include('admin.users.form')
             </x-modals.form-modal>
-
         </div>
     </div>
 @endsection

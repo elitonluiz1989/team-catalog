@@ -1,10 +1,16 @@
 <?php
 
-namespace App\Http\Requests\Admin\User;
+namespace App\Http\Requests\Admin\Products;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class UserUpdateRequest extends FormRequest
+/**
+ * @property string $name
+ * @property string $image
+ * @property string $link
+ * @property int $category_id
+ */
+class ProductCreateRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,9 +30,10 @@ class UserUpdateRequest extends FormRequest
     public function rules()
     {
         return [
-            'id' => 'required|integer',
-            'name' => 'nullable|string|required_without:name',
-            'password' => 'nullable|string|required_without:password'
+            'name' => 'required|string',
+            'image' => 'required|string',
+            'link' => 'required|string',
+            'category_id' => 'required|int|exists:categories,id'
         ];
     }
 }

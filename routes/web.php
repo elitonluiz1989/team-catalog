@@ -54,5 +54,14 @@ Route::namespace('App\Http\Controllers\Admin')
                         Route::delete('/{id}', 'CategoriesController@delete')->name('categories.delete');
                         Route::get('/order/last', 'CategoriesController@lastOrder')->name('categories.order.last');
                     });
+
+                Route::prefix('products/')
+                    ->group(function() {
+                        Route::get('', 'ProductsController@index')->name('products.index');
+                        Route::get('/{id}', 'ProductsController@find')->name('products.find');
+                        Route::post('/', 'ProductsController@create')->name('products.create');
+                        Route::put('/{id}', 'ProductsController@update')->name('products.update');
+                        Route::delete('/{id}', 'ProductsController@delete')->name('products.delete');
+                    });
             });
     });

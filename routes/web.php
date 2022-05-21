@@ -13,6 +13,20 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+Route::namespace('App\Http\Controllers')
+    ->group(function() {
+        Route::prefix('files/')
+            ->group(function() {
+                Route::get('/images/{filename}', 'FilesController@image')->name('files.images.view');
+
+                Route::middleware('auth')
+                    ->group(function() {
+                        Route::post('/upload', 'FilesController@upload')->name('files.upload');
+                        Route::delete('/delete', 'FilesController@delete')->name('files.delete');
+                    });
+            });
+    });
+
 Route::namespace('App\Http\Controllers\Admin')
     ->group(function() {
         Route::get('login', 'AuthController@login')->name('login');

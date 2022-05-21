@@ -2,7 +2,6 @@ import {AppFormMessage} from "../AppFormMessage/AppFormMessage";
 import {AppFormMessageDto} from "../AppFormMessage/Dtos/AppFormMessageDto";
 import {AppMask} from "../AppMask/AppMask";
 import {AppModal} from "../AppModal/AppModal";
-import {AppMaskDto} from "../AppMask/Dtos/AppMaskDto";
 import {AppRequest} from "../AppRequest/AppRequest";
 import {AppRequestDto} from "../AppRequest/Dtos/AppRequestDto";
 import {delay, isFunction} from "../helpers";
@@ -88,11 +87,17 @@ export class AppForm {
         }
 
         if (!settings.mask) {
-            settings.mask = new AppMaskDto();
-            settings.mask.withLoading = true;
+            this.#mask = new AppMask(settings.mask);
         }
+    }
 
-        this.#mask = new AppMask(settings.mask);
+    /**
+     * 
+     * @param {object} object 
+     * @returns {boolean}
+     */
+    static isInstanceOf(object) {
+        return object instanceof AppForm;
     }
 
     createRecordIdentifier(name, value) {
@@ -130,6 +135,14 @@ export class AppForm {
     setModal(dto) {
         this.#modal = new AppModal(dto);
         this.onFormModalClose();
+    }
+
+    /**
+     * 
+     * @param {AppMask} mask
+     */
+    setMask(mask) {
+        this.#mask = mask;
     }
 
     /**
@@ -305,7 +318,9 @@ export class AppForm {
         }
 
         this.#form.querySelectorAll('input, select, textarea').forEach(item => {
-            callback(item);
+            if (item.getAttribute('name')) {
+                callback(item);
+            }
         });
     }
 

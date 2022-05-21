@@ -31,8 +31,8 @@ class CategoryUpdateRequest extends FormRequest
     {
         return [
             'id' => 'required|integer',
-            'name' => 'nullable|string|unique:categories,name,' . $this->id,
-            'order' => 'nullable|integer|unique:categories,order,' . $this->id
+            'name' => 'nullable|string|unique:categories,name,' . $this->id .'|required_without:order',
+            'order' => 'nullable|integer|unique:categories,order,' . $this->id .'|required_without:name'
         ];
     }
 }

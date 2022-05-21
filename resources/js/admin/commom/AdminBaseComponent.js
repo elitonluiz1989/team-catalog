@@ -30,24 +30,36 @@ export class AdminBaseComponent extends AppCoreComponent {
      * @param {AppModalDto} appModalDto
      */
     configureAppForm(formId, formMessagesContainerId, appModalDto) {
-        const settings = new AppFormDto();
-        settings.form = document.querySelector(formId);
-        settings.message = new AppFormMessageDto();
-        settings.message.container = formMessagesContainerId;
+        const dto = new AppFormDto();
+        dto.form = document.querySelector(formId);
+        dto.message = new AppFormMessageDto();
+        dto.message.container = formMessagesContainerId;
 
         if (appModalDto) {
-            settings.modal = appModalDto;
+            dto.modal = appModalDto;
         }
 
-        this.#appForm = new AppForm(settings);
+        this.#appForm = new AppForm(dto);
         this.#appForm.addInvalidFieldEventHandler();
         this.#appForm.addSubmitEventHandler();
+
+        if (AppMask.isInstanceOf(this.#mask)) {
+            this.#appForm.setMask(this.#mask);
+        }
     }
 
     configureAppMask() {
-        const maskDto = new AppMaskDto();
-        maskDto.withLoading = true;
-        this.#mask = new AppMask(maskDto);
+        const dto = new AppMaskDto();
+        dto.withLoading = true;
+        dto.zIndex = 2000;
+        dto.backgroundColor = '#dadad9';
+        dto.spinnerColor = '#1d1c1f';
+
+        this.#mask = new AppMask(dto);
+        
+        if (AppForm.isInstanceOf(this.#appForm)) {
+            this.#appForm.setMask(this.#mask);
+        }
     }
 
     get appForm() {

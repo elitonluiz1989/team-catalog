@@ -85,16 +85,30 @@ export function selector(selector) {
  *
  * @param {object[]} arr
  * @param {string} property
+ * @param {string} clue
  * @returns {string}
  */
-export function objectArrayToString(arr, property) {
-    const str = arr.reduce((m, item) => {
-        if (!item.hasOwnProperty(property)) {
-            return m;
+export function objectArrayToString(arr, property, clue = '') {
+    let str = '';
+
+    if (isNullOrWhiteSpace(clue)) {
+        str = arr.reduce((m, item) => {
+            if (!item.hasOwnProperty(property)) {
+                return m;
+            }
+
+            return m + item[property].toString();
+        }, '');
+    } else {
+        const items = [];
+        for (const item of arr) {
+            if (item.hasOwnProperty(property)) {
+                items.push(item[property]);
+            }
         }
 
-        return m + item[property].toString();
-    }, '');
+        str = items.join(clue);
+    }
 
     return str.toString();
 }

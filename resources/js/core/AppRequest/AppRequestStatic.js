@@ -6,11 +6,25 @@ export class AppRequestStatic {
 
     /**
      *
-     * @param url
+     * @param {string} url
      * @returns {Promise<AppResponse>}
      */
     static async get(url) {
         return this.#request.url(url).execute();
+    }
+
+    /**
+     *
+     * @param {string} url
+     * @param {any} data
+     * @returns {Promise<AppResponse>}
+     */
+    static async post(url, data) {
+        return this.#request
+            .url(url)
+            .method(HttpVerbsEnum.POST)
+            .data(data)
+            .execute();
     }
 
     /**

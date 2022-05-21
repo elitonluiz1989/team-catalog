@@ -73,4 +73,8 @@ return [
         public_path('storage') => storage_path('app/public'),
     ],
 
+    'folders' => [
+        'files' => env('FILESYSTEM_FOLDERS_FILES', 'files'),
+        'images' => env('FILESYSTEM_FOLDERS_IMAGES', 'images')
+    ]
 ];

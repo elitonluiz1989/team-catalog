@@ -23,11 +23,28 @@ export class Selector {
 
     /**
      *
+     * @param {object} object
+     * @returns {boolean}
+     */
+    static isInstance(object) {
+        return object instanceof Selector;
+    }
+
+    /**
+     *
      * @param index
      * @returns {HTMLElement}
      */
     get(index) {
         return this.#selectors[index];
+    }
+
+    /**
+     *
+     * @returns {HTMLElement[]}
+     */
+    get selectors() {
+        return this.#selectors;
     }
 
     /**

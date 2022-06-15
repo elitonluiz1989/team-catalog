@@ -11,6 +11,10 @@ export class Category extends Entity{
         this.order = order;
     }
 
+    /**
+     * 
+     * @param {any} data 
+     */
     fill(data) {
         Entity.fillEntity(this, data);
     }

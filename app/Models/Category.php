@@ -8,17 +8,10 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Pagination\LengthAwarePaginator;
 
 /**
- * @property int $id
  * @property string $name
  * @property int $order
- * @property int $user_created_id
- * @property int $user_updated_id
- * @property int $user_deleted_id
- * @method static LengthAwarePaginator paginate(int $perPage = 15, array $columns = ['*'], string $pageName = 'page', int|null $page = null)
- * @method static Category find(int|string $id, array $columns = ['*'])
- * @method static int max()
  */
-class Category extends Model
+class Category extends BaseModel
 {
     use HasFactory, SoftDeletes;
 

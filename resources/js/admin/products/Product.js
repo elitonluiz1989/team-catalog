@@ -15,4 +15,12 @@ export class Product extends Entity {
         this.link = link;
         this.category_id = category_id;
     }
+
+    /**
+     * 
+     * @param {any} data 
+     */
+    fill(data) {
+        Entity.fillEntity(this, data);
+    }
 }

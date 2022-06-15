@@ -2,9 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Enums\UploadTypeEnum;
-use App\Http\Requests\Files\FilesRequest;
+use App\Enums\FileTypeEnum;
 use App\Http\Requests\Files\FileUploadRequest;
+use App\Http\Requests\Files\FilesRequest;
+use App\Services\FileService\Dtos\FileUploadDto;
 use App\Services\FileService\Dtos\FileUploadedDto;
 use App\Services\FileService\FileService;
 use Illuminate\Http\Request;
@@ -13,20 +14,22 @@ use Intervention\Image\ImageManagerStatic as Image;
 
 class FilesController extends Controller
 {
-    private FileService $service;
+    public function __construct(private FileService $service) {}
 
-    public function __construct(FileService $service)
+    public function view(Request $request, string $folder, string $image)
     {
-        $this->service = $service;
-        $this->service->folder = config('filesystem.disks', [])[config('filesystem.default', 'local')] ?? '';
-    }
+        $type = \strtoupper($request->input('type', 'files'));
+        $path = $this->service->getFullPath($image, $folder);
+        
+        if (!\file_exists($path) || !FileTypeEnum::hasKey($type)) {
+            \abort(404);
+        }
 
-    public function image(Request $request, string $image): Response
-    {
-        $this->service->subFolder = config('filesystems.folders.images');
-        $path = $this->service->getFullPath($image);
+        if (FileTypeEnum::getValue($type) == FileTypeEnum::IMAGE) {
+            return $this->renderImage($request, $path);
+        }
 
-        return $this->renderImage($request, $path);
+        return response()->file($path);
     }
 
     /**
@@ -35,19 +38,32 @@ class FilesController extends Controller
      */
     public function upload(FileUploadRequest $request): array
     {
-        $this->service->subFolder = $this->getUploadFolder($request->input('type', UploadTypeEnum::FILES));
-        $this->service->route = $request->input('route');
         $files = $request->file();
+        $type =  FileTypeEnum::fromValue((int)$request->input('type', 0));
+        $folder = env('TEMP_FOLDER', 'temp');
+        $route = 'files.view';
         $results = [];
 
         foreach ($files as $file) {
-            $results[] = $this->service->upload($file);
+            $dto = new FileUploadDto(
+                $file,
+                $folder,
+                $type,
+                $route
+            );
+
+            $results[] = $this->service->upload($dto);
         }
 
         return $results;
     }
 
-    public function delete(FilesRequest $request): bool
+    /**
+     *
+     * @param FilesRequest $request
+     * @return FileDeletedDto[]
+     */
+    public function delete(FilesRequest $request): array
     {
         $files = $request->input('files');
 
@@ -74,12 +90,5 @@ class FilesController extends Controller
         $format = $img->extension;
 
         return $img->response($format);
-    }
-
-    private function getUploadFolder(int $uploadType): string {
-        return match ($uploadType) {
-            UploadTypeEnum::IMAGES => config('filesystems.folders.images', 'images'),
-            default => config('filesystems.folders.files', 'files')
-        };
     }
 }

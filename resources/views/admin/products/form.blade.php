@@ -9,8 +9,9 @@
             <div
                 id="uploader-image"
                 class="input-group"
-                data-type="{{ \App\Enums\UploadTypeEnum::IMAGES }}"
+                data-type="{{ \App\Enums\FileTypeEnum::IMAGE }}"
                 data-route-upload="{{ route('files.upload') }}"
+                data-route-remove="{{ route('files.delete') }}"
                 data-route-view="files.images.view">
                 <div class="w-100 text-center">
                     <small>Click to upload an image</small>

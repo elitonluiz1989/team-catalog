@@ -27,7 +27,7 @@ export class AppMaskDto extends BaseDto {
         this.id = id;
         this.parent = parent;
         this.withLoading = withLoading ?? true;
-        this.position = position ?? 'absolute';
+        this.position = position ?? 'fixed';
         this.backgroundColor = backgroundColor ?? '#333';
         this.zIndex = zIndex ?? 9000;
         this.spinnerColor = spinnerColor ?? 'white';

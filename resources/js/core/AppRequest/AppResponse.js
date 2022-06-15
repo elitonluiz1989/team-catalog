@@ -1,4 +1,5 @@
 import { AxiosResponse, AxiosError } from "axios";
+import { objectArrayToString } from "../helpers";
 
 import {AppResponseError} from "./AppResponseError";
 
@@ -83,6 +84,14 @@ export class AppResponse {
      */
     get errors() {
         return this.#errors;
+    }
+
+    /**
+     * 
+     * @returns {string}
+     */
+    getErrorsString() {
+        return objectArrayToString(this.#errors, 'content');
     }
 
     /**

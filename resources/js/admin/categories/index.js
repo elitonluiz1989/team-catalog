@@ -17,12 +17,12 @@ export class CategoriesComponent extends AdminBaseComponent {
             '#category-form-modal-opener-btn',
             '#category-form-modal-dismiss-btn'
         );
-        this.configureAppForm(
+        this.configureform(
             '#category-form',
             '#category-form-messages',
             appModalDto
         );
-        this.configureAppMask();
+        this.configureMask();
 
         selector(appModalDto.openerButtonSelector)
             .on('click', async () => {

@@ -2,28 +2,23 @@
 
 namespace App\Models;
 
+use App\Enums\FileTypeEnum;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
- * @property int $id
  * @property string $name
  * @property string $image
  * @property string $link
  * @property int $category_id
  * @property Category $category
- * @property int $user_created_id
- * @property int $user_updated_id
- * @property int $user_deleted_id
- * @method static LengthAwarePaginator paginate(int $perPage = 15, array $columns = ['*'], string $pageName = 'page', int|null $page = null)
- * @method static Product find(int|string $id, array $columns = ['*'])
- * @method static int max()
+ * @property string $image_src
  */
-class Product extends Model
+class Product extends BaseModel
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
     protected $fillable = [
         'name',
@@ -35,7 +30,26 @@ class Product extends Model
         'user_deleted_id'
     ];
 
+    protected $appends = [
+        'image_src'
+    ];
+
     public function category(): BelongsTo {
         return $this->belongsTo(Category::class);
+    }
+
+    public function imageSrc(): Attribute {
+        if (empty($this->image)) {
+            return Attribute::make(
+                get: fn () => asset('images/empty.png')
+            );
+        }
+        
+        $path = explode('/', $this->image);
+        $filename = $path[count($path) - 1];
+
+        return Attribute::make(
+            get: fn () => route('files.view', ['folder' => 'images', 'filename' => $filename, 'type' => FileTypeEnum::getKey(FileTypeEnum::IMAGE) ])
+        );
     }
 }

@@ -15,12 +15,12 @@ export class UserComponent extends AdminBaseComponent {
             '#user-form-modal-opener-btn',
             '#user-form-modal-dismiss-btn'
         );
-        this.configureAppForm(
+        this.configureform(
             '#user-form',
             '#user-form-messages',
             appModalDto
         );
-        this.configureAppMask();
+        this.configureMask();
 
         /**
          *

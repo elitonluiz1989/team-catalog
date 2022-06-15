@@ -2,8 +2,7 @@
 
 namespace App\Services\FileService\Dtos;
 
-class FileUploadedDto
-{
+class FileUploadedDto {
     public function __construct(
         public ?string $url = null,
         public ?string $filename = null,

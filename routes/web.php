@@ -17,7 +17,7 @@ Route::namespace('App\Http\Controllers')
     ->group(function() {
         Route::prefix('files/')
             ->group(function() {
-                Route::get('/images/{filename}', 'FilesController@image')->name('files.images.view');
+                Route::get('/{folder}/{filename}', 'FilesController@view')->name('files.view');
 
                 Route::middleware('auth')
                     ->group(function() {

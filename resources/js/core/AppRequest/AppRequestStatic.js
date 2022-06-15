@@ -1,3 +1,4 @@
+import { isNullOrUndefined } from "../helpers";
 import {AppRequest} from "./AppRequest";
 import HttpVerbsEnum from "./Enums/HttpVerbsEnum";
 
@@ -10,7 +11,10 @@ export class AppRequestStatic {
      * @returns {Promise<AppResponse>}
      */
     static async get(url) {
-        return this.#request.url(url).execute();
+        return this.#request
+            .url(url)
+            .method(HttpVerbsEnum.GET)
+            .execute();
     }
 
     /**
@@ -23,17 +27,26 @@ export class AppRequestStatic {
         return this.#request
             .url(url)
             .method(HttpVerbsEnum.POST)
-            .data(data)
+            .setData(data)
             .execute();
     }
 
     /**
      *
      * @param {string} url
+     * @param {any} data
      * @returns {Promise<AppResponse>}
      */
-    static async delete(url) {
-        return this.#request.url(url).method(HttpVerbsEnum.DELETE).execute();
+    static async delete(url, data = null) {
+        this.#request
+            .url(url)
+            .method(HttpVerbsEnum.DELETE)
+
+        if (!isNullOrUndefined(data)) {
+            this.#request.setData(data);
+        }
+            
+        return await this.#request.execute();
     }
 
     /**

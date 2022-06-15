@@ -1,7 +1,6 @@
 import {Selector} from "../Selector";
-import {isFunction, objectArrayToString, randId} from "../helpers";
+import {isFunction, isNullOrUndefined, objectArrayToString, randId} from "../helpers";
 import {AppRequest} from "../AppRequest/AppRequest";
-import HttpVerbsEnum from "../AppRequest/Enums/HttpVerbsEnum";
 import {AppProgressBar} from "../AppProgressBar";
 import {AppProgressBarDto} from "../AppProgressBar/Dtos/AppProgressBarDto";
 import {AppMask} from "../AppMask/AppMask";
@@ -41,6 +40,12 @@ export class AppUploader {
     #request;
 
     /**
+     * 
+     * @type {any}
+     */
+    #results;
+
+    /**
      *
      * @param {AppUploaderDto} dto
      */
@@ -56,12 +61,33 @@ export class AppUploader {
     }
 
     /**
+     * 
+     * @param {any} object 
+     * @returns {boolean}
+     */
+    static isInstanceOf(object) {
+        return object instanceof AppUploader;
+    }
+
+    /**
      *
      * @param {AppUploaderDto} dto
      * @returns {AppUploader}
      */
     static create(dto) {
         return new AppUploader(dto);
+    }
+
+    /**
+     * 
+     * @returns {any}
+     */
+    get results() {
+        return this.#results;
+    }
+
+    get hasResults() {
+        return !isNullOrUndefined(this.#results);
     }
 
     #createUploader() {
@@ -86,6 +112,12 @@ export class AppUploader {
     }
 
     #createMask() {
+        if (AppMask.isInstanceOf(this.#settings.mask)) {
+            this.#mask = this.#settings.mask;
+
+            return;
+        }
+
         const dto = new AppMaskDto()
         dto.id = this.#settings.id ? `${this.#settings.id}-mask` : null;
         dto.parent = this.#settings.parent.get(0);
@@ -108,6 +140,10 @@ export class AppUploader {
 
     #setUploadEvent() {
         this.#uploader?.on('change', async evt => {
+            if (isFunction(this.#settings.onRemove)) {
+                await this.#settings.onRemove();
+            }
+
             if (evt.target.files?.length > 0) {
                 const data = new FormData();
                 data.append('files', evt.target.files[0]);
@@ -118,18 +154,21 @@ export class AppUploader {
                     }
                 }
 
+                if (!this.#mask.isVisible) {
+                    await this.#mask.show();
+                }
+
                 await this.#progressBar.show();
-                await this.#mask.show();
 
                 const response = await this.#request
-                    .url(this.#settings.route)
-                    .method(HttpVerbsEnum.POST)
+                    .url(this.#settings.route.url)
+                    .method(this.#settings.route.method)
                     .setData(data)
                     .onUploadProgress(evt => {
                         const progress = `${Math.round((evt.loaded * 100) / evt.total)}%`;
                         this.#progressBar.progress(progress);
 
-                        console.log(`The ${this.#settings.fieldName} is ${progress} uploaded... `);
+                        console.log(`Upload progress: ${progress}`);
                     })
                     .execute();
 
@@ -138,21 +177,16 @@ export class AppUploader {
                     throw new Error(message);
                 }
 
-                await this.#callOnComplete(response.data);
+                this.#results = response.data;
+
+                if (isFunction(this.#settings.onComplete)) {
+                    await this.#settings.onComplete(this.#results);
+                    await delay(500);
+                }
+
                 await this.#progressBar.hide();
                 await this.#mask.hide();
             }
         });
-    }
-
-    /**
-     * 
-     * @param {any} data 
-     */
-    async #callOnComplete(data) {
-        if (isFunction(this.#settings.onComplete)) {
-            await this.#settings.onComplete(data);
-            await delay(500);
-        }
     }
 }

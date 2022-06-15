@@ -1,4 +1,4 @@
-import {delay, randId} from "../helpers";
+import {delay, isNullOrUndefined, randId} from "../helpers";
 import {AppElement} from "../AppElement";
 import { AppMaskDto } from './Dtos/AppMaskDto';
 
@@ -19,7 +19,19 @@ export class AppMask {
      *
      * @type {AppElement}
      */
-    #loading;
+     #loading;
+
+    /**
+     *
+     * @type {AppElement}
+     */
+     #loadingText;
+
+    /**
+     * 
+     * @type {boolean}
+     */
+    #isVisible = false;
 
     /**
      *
@@ -49,6 +61,8 @@ export class AppMask {
         this.#mask.setStyle('opacity', 0.8);
 
         this.showLoading();
+
+        this.#isVisible = true;
     }
 
     async hide() {
@@ -59,6 +73,8 @@ export class AppMask {
         await delay(500);
 
         this.#mask.setStyle('display', 'none');
+
+        this.#isVisible = false;
     }
 
     showLoading() {
@@ -80,6 +96,35 @@ export class AppMask {
         await delay(500)
 
         this.#loading.setStyle('display', 'none');
+    }
+
+    get isVisible() {
+        return this.#isVisible;
+    }
+
+    setLoadingMessage(message, styles = null) {
+        if (isNullOrUndefined(this.#loading)) {
+            return;
+        }
+
+        if (isNullOrUndefined(styles)) {
+            styles = {
+                fontSize: '0.8rem',
+                color: this.#settings.spinnerColor
+            }
+        }
+
+        if (isNullOrUndefined(this.#loadingText)) {
+            this.#loadingText = AppElement.create('div');
+            this.#loading.appendChild(this.#loadingText);
+        }
+
+        this.#loadingText.setStyles(styles);
+        this.#loadingText.element.textContent = message;
+    }
+
+    clearLoadingMessage() {
+        this.setLoadingMessage('');
     }
 
     /**
@@ -166,6 +211,7 @@ export class AppMask {
         this.#loading.element.id = this.#createRandomId(`${this.#settings.id}-loading`);
         this.#loading.setStyles({
             display: 'none',
+            flexFlow: 'column',
             alignItems: 'center',
             justifyContent: 'center',
             height: '100%',

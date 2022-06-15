@@ -25,9 +25,7 @@ class FileUploadRequest extends FormRequest
     {
         return [
             'type' => 'nullable|string',
-            'route' => 'required|string',
-            'images.*' => 'nullable|image|mimes:jpg,png,jpeg|required_without:files',
-            'files.*' => 'nullable|file|required_without:images'
+            'files.*' => 'required|file'
         ];
     }
 }

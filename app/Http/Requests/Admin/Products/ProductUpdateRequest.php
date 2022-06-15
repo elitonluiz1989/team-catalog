@@ -34,8 +34,9 @@ class ProductUpdateRequest extends FormRequest
             'id' => 'required|int',
             'name' => 'nullable|string|required_without:image,link,category_id',
             'image' => 'nullable|string|required_without:name,link,category_id',
+            'image_removed' => 'nullable|string|required_with:image',
             'link' => 'nullable|string|required_without:name,image,category_id',
-            'category_id' => 'nullable|int|exists:categories|required_without:name,image,link'
+            'category_id' => 'nullable|int|exists:categories,id|required_without:name,image,link'
         ];
     }
 }

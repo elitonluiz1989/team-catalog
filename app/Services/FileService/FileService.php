@@ -2,80 +2,77 @@
 
 namespace App\Services\FileService;
 
+use App\Services\FileService\Dtos\FileDeletedDto;
+use App\Services\FileService\Dtos\FileUploadDto;
 use App\Services\FileService\Dtos\FileUploadedDto;
-use Faker\Core\File;
-use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 
 class FileService
 {
-    public string $route;
+    /**
+     *
+     * @param string[] $files
+     * @return FileDeletedDto[]
+     */
+    public function delete(array $files): array {
+        $results = [];
 
-    public string $folder;
+        foreach ($files as $file) {
+            $path = $this->getFullPath($file);
 
-    public string $subFolder;
+            $fileDeleted = new FileDeletedDto();
+            $fileDeleted->file = $file;
+            $fileDeleted->deleted = \unlink($path);
 
-    public function delete(array $images): bool
-    {
-        $files = [];
-
-        foreach ($images as $image) {
-            $filename = $this->getFileName($image);
-            $files[] = $this->getRelativePath($filename);
+            $results[] = $fileDeleted;
         }
 
-        return Storage::disk(env('FILESYSTEM_DRIVER'))->delete($files);
+        return $results;
     }
 
-    public function upload(UploadedFile $file): FileUploadedDto
-    {
+    public function upload(FileUploadDto $params): FileUploadedDto {
         $dto = new FileUploadedDto();
-        $filename = uniqid(rand(), true) . '.' . time() . '.' . $file->extension();
-        $result = $file->storeAs($this->getRelativePath(), $filename);
+        $filename = uniqid(rand(), true) . '.' . time() . '.' . $params->file->extension();
+        $result = $params->file->storeAs($params->destination, $filename);
 
         if (empty($result)) {
-            $dto->error = "{$file->getFilename()} was not uploaded.";
+            $dto->error = "{$params->file->getFilename()} was not uploaded.";
 
             return $dto;
         }
 
-        $dto->url = route($this->route, ['filename' => $filename]);
+        if (!empty($params->viewRoute)) {
+            $dto->url = route($params->viewRoute, ['folder' => $params->destination, 'filename' => $filename, 'type' => $params->type->key]);
+        }
+        
         $dto->filename = $filename;
-        $dto->path = $this->getRelativePath($filename);
+        $dto->path = $this->getRelativePath($params->destination, $filename);
 
         return $dto;
     }
 
-    public function getRelativePath(string $filename = null): string
-    {
-        $path = $this->folder;
+    public function move(string $file, string $folder): string {
+        $source = $this->getFullPath($file);
+        $destination = $this->getRelativePath($folder, $this->getFileName($file));
 
-        if (null != $this->subFolder)
-        {
-            if (!empty($path)) {
-                $path .= DIRECTORY_SEPARATOR;
-            }
-
-            $path .= $this->subFolder;
+        if (!Storage::move($file, $destination)) {
+            return '';
         }
 
-        if (null != $filename)
-        {
-            $path .= DIRECTORY_SEPARATOR . $filename;
-        }
-
-        return $path;
+        return $destination;
     }
 
-    public function getFullPath(string $filename = null): string {
-        $path = $this->getRelativePath($filename);
+    public function getRelativePath(string $folder, string $filename = null): string {
+        return $folder . DIRECTORY_SEPARATOR . $filename;
+    }
+
+    public function getFullPath(string $filename, ?string $folder = null): string {
+        $path = empty($folder) ? $filename : $this->getRelativePath($folder, $filename);
 
         return Storage::path($path);
     }
 
-    private function getFileName(string $image): string
-    {
+    private function getFileName(string $image): string {
         return basename($image);
     }
 }

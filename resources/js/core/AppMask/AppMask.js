@@ -1,75 +1,147 @@
-import {randId} from "../helpers";
+import {delay, isNullOrUndefined, randId} from "../helpers";
+import {AppElement} from "../AppElement";
+import { AppMaskDto } from './Dtos/AppMaskDto';
 
 export class AppMask {
     /**
      *
-     * @type {string}
+     * @type {AppMaskDto}
      */
-    #maskId;
+    #settings;
 
     /**
      *
-     * @type {string}
+     * @type {AppElement}
      */
-    #loadingContainerId;
+    #mask;
 
     /**
      *
-     * @type {HTMLElement}
+     * @type {AppElement}
      */
-    #container;
+     #loading;
 
     /**
      *
-     * @type {Boolean}
+     * @type {AppElement}
      */
-    #withLoading;
+     #loadingText;
+
+    /**
+     * 
+     * @type {boolean}
+     */
+    #isVisible = false;
 
     /**
      *
-     * @param {?AppMaskDto} settings
+     * @param {AppMaskDto} settings
      */
-    constructor(settings = null) {
-        this.#maskId = settings.maskId ?? this.#createRandomId('app-mask');
-        this.#container = settings.container ?? document.querySelector('body');
-        this.#withLoading = settings.withLoading ?? false;
+    constructor(settings) {
+        this.#validateSettings(settings);
 
-        if (this.#withLoading) {
-            this.#loadingContainerId = this.#createRandomId('app-mask-loading')
+        this.#createMask();
+
+        if (this.#settings.withLoading) {
+            this.#createLoadingContainer();
         }
+    }
+
+    /**
+     * 
+     * @param {object} object 
+     * @returns {boolean}
+     */
+    static isInstanceOf(object) {
+        return object instanceof AppMask;
     }
 
     async show() {
-        const mask = this.#getMask();
-        mask.classList.remove('d-none');
-        mask.classList.add('show');
+        this.#mask.setStyle('display', 'flex');
+        this.#mask.setStyle('opacity', 0.8);
 
-        if (this.#withLoading) {
-            const container = this.#getLoadingContainer();
-            container.classList.remove('d-none');
-            container.classList.add('d-flex');
-        }
+        this.showLoading();
+
+        this.#isVisible = true;
     }
 
     async hide() {
-        const mask = this.#getMask();
+        await this.hideLoading();
 
-        if (mask) {
-            mask.classList.remove('show');
-            mask.classList.add('d-none');
-        }
+        this.#mask.setStyle('opacity', 0);
 
-        if (this.#withLoading) {
-            const container = this.#getLoadingContainer();
+        await delay(500);
 
-            if (container) {
-                container.classList.remove('d-flex');
-                container.classList.add('d-none');
-            }
-        }
+        this.#mask.setStyle('display', 'none');
+
+        this.#isVisible = false;
     }
 
-    // noinspection JSMethodCanBeStatic
+    showLoading() {
+        if (!(this.#loading instanceof AppElement)) {
+            return;
+        }
+
+        this.#loading.setStyle('display', 'flex');
+        this.#loading.setStyle('opacity', 1);
+    }
+
+    async hideLoading() {
+        if (!(this.#loading instanceof AppElement)) {
+            return;
+        }
+
+        this.#loading.setStyle('opacity', 0);
+
+        await delay(500)
+
+        this.#loading.setStyle('display', 'none');
+    }
+
+    get isVisible() {
+        return this.#isVisible;
+    }
+
+    setLoadingMessage(message, styles = null) {
+        if (isNullOrUndefined(this.#loading)) {
+            return;
+        }
+
+        if (isNullOrUndefined(styles)) {
+            styles = {
+                fontSize: '0.8rem',
+                color: this.#settings.spinnerColor
+            }
+        }
+
+        if (isNullOrUndefined(this.#loadingText)) {
+            this.#loadingText = AppElement.create('div');
+            this.#loading.appendChild(this.#loadingText);
+        }
+
+        this.#loadingText.setStyles(styles);
+        this.#loadingText.element.textContent = message;
+    }
+
+    clearLoadingMessage() {
+        this.setLoadingMessage('');
+    }
+
+    /**
+     *
+     * @param {AppMaskDto} settings
+     */
+    #validateSettings(settings) {
+        if (!AppMaskDto.isInstanceOf(settings)) {
+           settings = new AppMaskDto();
+        }
+
+        this.#settings = settings.copy();
+        this.#settings.id = settings.id ?? this.#createRandomId('app-mask');
+        this.#settings.parent = settings.parent ?? document.querySelector('body');
+        this.#settings.withLoading = settings.withLoading;
+    }
+
     /**
      *
      * @param {string} prefix
@@ -81,83 +153,77 @@ export class AppMask {
         return `${prefix}-${randomNumber}`;
     }
 
-    /**
-     *
-     * @returns {HTMLDivElement}
-     */
     #createMask() {
-        const mask = document.createElement('div');
-        mask.id = this.#maskId;
-        mask.classList.add(
-            'mask',
-            'fade',
-            'h-100',
-            'w-100',
-            'position-fixed'
-        );
+        this.#mask = new AppElement();
+        this.#mask.createElement('div');
+        this.#mask.element.id = this.#settings.id;
+        this.#mask.setStyles({
+            display: 'none',
+            height: '100%',
+            width: '100%',
+            position: this.#settings.position,
+            top: 0,
+            left: 0,
+            zIndex: this.#settings.zIndex,
+            opacity: 0,
+            backgroundColor: this.#settings.backgroundColor,
+        });
 
-        this.#container.appendChild(mask);
-
-        return mask;
+        this.#settings.parent.appendChild(this.#mask.element);
     }
 
-    /**
-     *
-     * @returns {Element}
-     */
-    #getMask() {
-        let mask = document.getElementById(this.#maskId);
-
-        if (!mask) {
-            mask = this.#createMask();
-        }
-
-        return mask;
-    }
-
-    /**
-     *
-     * @returns {HTMLDivElement}
-     */
     #createLoadingContainer() {
-        const srOnly = document.createElement('span');
-        srOnly.classList.add('sr-only');
-        srOnly.textContent = 'Loading...';
+        const srOnly = new AppElement();
+        srOnly.createElement('div');
+        srOnly.setStyles({
+            position: 'absolute',
+            width: '1px',
+            height: '1px',
+            padding: 0,
+            margin: '-1px',
+            overflow: 'hidden',
+            clip: 'rect(0, 0, 0, 0)',
+            whiteSpace: 'nowrap',
+            borderWidth: 0
+        });
+        srOnly.element.textContent = 'Loading...';
 
-        const spinner = document.createElement('div');
-        spinner.classList.add('spinner-border');
-        spinner.setAttribute('role', 'status');
+        const spinner = new AppElement();
+        spinner.createElement('div');
+        spinner.setStyles({
+            display: 'inline-block',
+            width: '2rem',
+            height: '2rem',
+            verticalAlign: '-0.125em',
+            borderWidth: '0.25em',
+            borderStyle: 'solid',
+            borderColor: this.#settings.spinnerColor,
+            borderRightColor: 'transparent',
+            borderRadius: '50%',
+            '-webkit-animation': '0.75s linear infinite spinner-border',
+            animation: '0.75s linear infinite spinner-border'
+        });
+        spinner.element.setAttribute('role', 'status');
         spinner.appendChild(srOnly);
+        
+        this.#loading = new AppElement();
+        this.#loading.createElement('div');
+        this.#loading.element.id = this.#createRandomId(`${this.#settings.id}-loading`);
+        this.#loading.setStyles({
+            display: 'none',
+            flexFlow: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            height: '100%',
+            width: '100%',
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            zIndex: this.#settings.zIndex + 1,
+            backgroundColor: 'transparent'
+        });
+        this.#loading.appendChild(spinner);
 
-        const container = document.createElement('div');
-        container.id = this.#loadingContainerId;
-        container.classList.add(
-            'mask__content',
-            'd-none',
-            'h-100',
-            'w-100',
-            'position-fixed',
-            'align-items-center',
-            'justify-content-center'
-        );
-        container.appendChild(spinner);
-
-        this.#container.appendChild(container);
-
-        return container;
-    }
-
-    /**
-     *
-     * @returns {Element}
-     */
-    #getLoadingContainer() {
-        let container = document.getElementById(this.#loadingContainerId);
-
-        if (!container) {
-            container = this.#createLoadingContainer();
-        }
-
-        return container;
+        this.#settings.parent.appendChild(this.#loading.element);
     }
 }

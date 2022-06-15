@@ -1,5 +1,5 @@
 import {AppCoreComponent} from "../../core/AppCoreComponent";
-import {AppForm} from "../../core/AppForm/AppForm";
+import {AppForm} from "../../core/Appform/Appform";
 import {AppFormDto} from "../../core/AppForm/Dtos/AppFormDto";
 import {AppFormMessageDto} from "../../core/AppFormMessage/Dtos/AppFormMessageDto";
 import {AppMask} from "../../core/AppMask/AppMask";
@@ -9,8 +9,15 @@ import HttpVerbsEnum from "../../core/AppRequest/Enums/HttpVerbsEnum";
 import {getEventTargetHandled, objectArrayToString, selector} from "../../core/helpers";
 
 import {getButtonEventTarget} from "../../helpers";
+import { isFunction } from './../../core/helpers';
 
 export class AdminBaseComponent extends AppCoreComponent {
+    /**
+     *
+     * @type {AppForm}
+     */
+    form;
+
     /**
      *
      * @type {AppMask}
@@ -19,42 +26,44 @@ export class AdminBaseComponent extends AppCoreComponent {
 
     /**
      *
-     * @type {AppForm}
-     */
-    #appForm;
-
-    /**
-     *
      * @param {string} formId
      * @param {string} formMessagesContainerId
      * @param {AppModalDto} appModalDto
      */
-    configureAppForm(formId, formMessagesContainerId, appModalDto) {
-        const settings = new AppFormDto();
-        settings.form = document.querySelector(formId);
-        settings.message = new AppFormMessageDto();
-        settings.message.container = formMessagesContainerId;
+    configureform(formId, formMessagesContainerId, appModalDto) {
+        const dto = new AppFormDto();
+        dto.form = document.querySelector(formId);
+        dto.message = new AppFormMessageDto();
+        dto.message.container = formMessagesContainerId;
 
         if (appModalDto) {
-            settings.modal = appModalDto;
+            dto.modal = appModalDto;
         }
 
-        this.#appForm = new AppForm(settings);
-        this.#appForm.addInvalidFieldEventHandler();
-        this.#appForm.addSubmitEventHandler();
+        this.form = new AppForm(dto);
+        this.form.addInvalidFieldEventHandler();
+        this.form.addSubmitEventHandler();
+
+        if (AppMask.isInstanceOf(this.#mask)) {
+            this.form.setMask(this.#mask);
+        }
     }
 
-    configureAppMask() {
-        const maskDto = new AppMaskDto();
-        maskDto.withLoading = true;
-        this.#mask = new AppMask(maskDto);
+    configureMask() {
+        const dto = new AppMaskDto();
+        dto.withLoading = true;
+        dto.zIndex = 2000;
+        dto.backgroundColor = '#dadad9';
+        dto.spinnerColor = '#1d1c1f';
+
+        this.#mask = new AppMask(dto);
+        
+        if (AppForm.isInstanceOf(this.form)) {
+            this.form.mask = this.#mask;
+        }
     }
 
-    get appForm() {
-        return this.#appForm;
-    }
-
-    get appMask() {
+    get mask() {
         return this.#mask;
     }
 
@@ -68,16 +77,20 @@ export class AdminBaseComponent extends AppCoreComponent {
                 await this.#mask.show();
 
                 const formDefaultSettings = {
-                    action: this.#appForm.form.getAttribute('action'),
-                    method: this.#appForm.form.getAttribute('method')
+                    action: this.form.form.getAttribute('action'),
+                    method: this.form.form.getAttribute('method')
                 }
                 const eventTargetDto = getEventTargetHandled(evt, getButtonEventTarget);
 
                 this.#disableAllButtons(eventTargetDto.parent);
 
-                this.#appForm.onFormModalClose(() => {
+                this.form.onFormModalClose(() => {
                     this.#disableAllButtons(eventTargetDto.parent, false);
-                    this.#appForm.setRoute(formDefaultSettings.action, formDefaultSettings.method);
+                    this.form.setRoute(formDefaultSettings.action, formDefaultSettings.method);
+
+                    if (isFunction(dto.onFormClose)) {
+                        dto.onFormClose(this.form);
+                    }
                 });
 
                 try {
@@ -92,11 +105,11 @@ export class AdminBaseComponent extends AppCoreComponent {
 
                     if (dto.callback instanceof Function) {
 
-                        dto.callback(this.#appForm, response.data);
+                        dto.callback(this.form, response.data);
                     }
 
-                    this.#appForm.setRoute(route, HttpVerbsEnum.PUT);
-                    this.#appForm.open();
+                    this.form.setRoute(route, HttpVerbsEnum.PUT);
+                    this.form.open();
                 } catch (error) {
                     console.error(error);
                     alert(error.message);

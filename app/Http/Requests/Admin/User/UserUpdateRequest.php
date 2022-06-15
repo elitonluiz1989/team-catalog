@@ -25,8 +25,8 @@ class UserUpdateRequest extends FormRequest
     {
         return [
             'id' => 'required|integer',
-            'name' => 'nullable|string',
-            'password' => 'nullable|string'
+            'name' => 'nullable|string|required_without:name',
+            'password' => 'nullable|string|required_without:password'
         ];
     }
 }

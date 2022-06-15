@@ -24,13 +24,11 @@ export class AppRequest {
 
     /**
      *
-     * @param {?AppRequestDto} settings
+     * @param {?AxiosRequestConfig} settings
      */
     constructor(settings = null) {
         if (settings) {
-            this.#requestConfig.url =  settings.url;
-            this.#requestConfig.method = settings.method;
-            this.#requestConfig.data = settings.data;
+            this.#requestConfig =  settings;
         }
 
         this.#route = new AppRequestRoute();
@@ -58,6 +56,16 @@ export class AppRequest {
 
     /**
      *
+     * @param {Function} callback
+     * @returns {AppRequest}
+     */
+    onUploadProgress(callback) {
+        this.#requestConfig.onUploadProgress = callback;
+        return this;
+    }
+
+    /**
+     *
      * @returns {Promise<AppResponse>}
      */
     async execute() {
@@ -77,9 +85,11 @@ export class AppRequest {
 
     /**
      * @param {any} data
+     * @returns {AppRequest}
      */
     setData(data) {
         this.#requestConfig.data = data;
+        return this;
     }
 
     clearData() {

@@ -2,12 +2,29 @@ import {AppFormMessage} from "../AppFormMessage/AppFormMessage";
 import {AppFormMessageDto} from "../AppFormMessage/Dtos/AppFormMessageDto";
 import {AppMask} from "../AppMask/AppMask";
 import {AppModal} from "../AppModal/AppModal";
-import {AppMaskDto} from "../AppMask/Dtos/AppMaskDto";
 import {AppRequest} from "../AppRequest/AppRequest";
 import {AppRequestDto} from "../AppRequest/Dtos/AppRequestDto";
-import {delay, isFunction} from "../helpers";
+import {delay, isFunction, isNullOrUndefined} from "../helpers";
 
 export class AppForm {
+    /**
+     *
+     * @type {AppMask}
+     */
+    mask;
+
+    /**
+     * 
+     * @type {Function}
+     */
+    beforeSubmitHandler;
+
+    /**
+     * 
+     * @type {object}
+     */
+    record;
+
     /**
      *
      * @type {HTMLFormElement}
@@ -51,10 +68,10 @@ export class AppForm {
     #modal;
 
     /**
-     *
-     * @type {AppMask}
+     * 
+     * @type {boolean}
      */
-    #mask;
+    #saved;
 
     /**
      *
@@ -88,14 +105,39 @@ export class AppForm {
         }
 
         if (!settings.mask) {
-            settings.mask = new AppMaskDto();
-            settings.mask.withLoading = true;
+            this.mask = new AppMask(settings.mask);
         }
 
-        this.#mask = new AppMask(settings.mask);
+        this.#saved = false;
     }
 
-    createRecordIdentifier(name, value) {
+    /**
+     * 
+     * @param {object} object 
+     * @returns {boolean}
+     */
+    static isInstanceOf(object) {
+        return object instanceof AppForm;
+    }
+
+    get isEdition() {
+        return !isNullOrUndefined(this.#recordIdentifier);
+    }
+
+    /**
+     *
+     * @param {any} data
+     */
+    set requestData(data){
+        this.#request.setData(data);
+    }
+
+    /**
+     * 
+     * @param {string} name 
+     * @param {?any} value 
+     */
+    createRecordIdentifier(name, value = null) {
         const elementId = `record-${name}`;
 
         this.#recordIdentifier = document.getElementById(elementId);
@@ -107,7 +149,7 @@ export class AppForm {
             this.#recordIdentifier.setAttribute('name', name);
         }
 
-        this.#recordIdentifier.value = value;
+        this.#recordIdentifier.value = value ?? this.record[name];
 
         this.#form.appendChild(this.#recordIdentifier);
     }
@@ -133,10 +175,22 @@ export class AppForm {
     }
 
     /**
-     *
-     * @param {any} data
+     * 
+     * @param {AppMask} mask
      */
-    fill(data) {
+    setMask(mask) {
+        this.mask = mask;
+    }
+
+    /**
+     *
+     * @param {?any} data
+     */
+    fill(data = null) {
+        if (isNullOrUndefined(data)) {
+            data = Object.assign({}, this.record);
+        }
+
         for (const item in data) {
             if (this.#form.hasOwnProperty(item)) {
                 this.#form[item].value = data[item];
@@ -187,8 +241,17 @@ export class AppForm {
         }
     }
 
+    reset() {
+        this.#form.reset();
+        this.#message.remove();
+
+        if (this.isEdition) {
+            this.fill();
+        }
+    }
+
     async submit() {
-        await this.#mask.show();
+        await this.mask.show();
 
         if (!this.#request.hasData) {
             this.#request.setData(this.#getFormData());
@@ -196,14 +259,17 @@ export class AppForm {
 
         const response = await this.#request.execute();
 
-        await this.#mask.hide();
+        await this.mask.hide();
 
         if (response.hasErrors) {
             this.#message.errors(response.errors);
             this.#request.clearData();
+            this.#saved = false;
 
             return;
         }
+
+        this.#saved = true;
 
         await this.#message.success(response.data);
 
@@ -211,10 +277,9 @@ export class AppForm {
 
         await this.#modal.close();
 
-        await this.#mask.show();
+        await this.mask.show();
 
-        this.#form.reset();
-        this.#message.remove();
+        this.reset();
 
         window.location.reload();
     }
@@ -234,7 +299,13 @@ export class AppForm {
     addSubmitEventHandler() {
         this.#form.addEventListener('submit', async (evt) => {
             evt?.preventDefault();
+
+            if (isFunction(this.beforeSubmitHandler)) {
+                this.beforeSubmitHandler(this);
+            }
+
             await this.submit();
+
         }, false);
     }
 
@@ -277,22 +348,26 @@ export class AppForm {
         return this.#form;
     }
 
+    get saved() {
+        return this.#saved;
+    }
+
     /**
      *
      * @returns {object}
      */
     #getFormData() {
-        const formData = {};
+        const data = {};
 
         this.#iterateFormFields(field => {
             if (this.#removeDisabledFieldsOnSubmit && field.getAttribute('disabled')) {
                 return;
             }
 
-            formData[field.getAttribute('name')] = field.value;
+            data[field.getAttribute('name')] = field.value;
         });
 
-        return formData;
+        return data;
     }
 
     /**
@@ -305,7 +380,9 @@ export class AppForm {
         }
 
         this.#form.querySelectorAll('input, select, textarea').forEach(item => {
-            callback(item);
+            if (item.getAttribute('name')) {
+                callback(item);
+            }
         });
     }
 

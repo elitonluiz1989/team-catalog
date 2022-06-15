@@ -21,6 +21,10 @@ export class User extends Entity {
         this.password = password;
     }
 
+    /**
+     * 
+     * @param {any} data 
+     */
     fill(data) {
         Entity.fillEntity(this, data);
     }

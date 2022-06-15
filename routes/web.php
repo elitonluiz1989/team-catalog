@@ -13,6 +13,20 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+Route::namespace('App\Http\Controllers')
+    ->group(function() {
+        Route::prefix('files/')
+            ->group(function() {
+                Route::get('/{folder}/{filename}', 'FilesController@view')->name('files.view');
+
+                Route::middleware('auth')
+                    ->group(function() {
+                        Route::post('/upload', 'FilesController@upload')->name('files.upload');
+                        Route::delete('/delete', 'FilesController@delete')->name('files.delete');
+                    });
+            });
+    });
+
 Route::namespace('App\Http\Controllers\Admin')
     ->group(function() {
         Route::get('login', 'AuthController@login')->name('login');
@@ -39,6 +53,15 @@ Route::namespace('App\Http\Controllers\Admin')
                         Route::put('/{id}', 'CategoriesController@update')->name('categories.update');
                         Route::delete('/{id}', 'CategoriesController@delete')->name('categories.delete');
                         Route::get('/order/last', 'CategoriesController@lastOrder')->name('categories.order.last');
+                    });
+
+                Route::prefix('products/')
+                    ->group(function() {
+                        Route::get('', 'ProductsController@index')->name('products.index');
+                        Route::get('/{id}', 'ProductsController@find')->name('products.find');
+                        Route::post('/', 'ProductsController@create')->name('products.create');
+                        Route::put('/{id}', 'ProductsController@update')->name('products.update');
+                        Route::delete('/{id}', 'ProductsController@delete')->name('products.delete');
                     });
             });
     });

@@ -1,5 +1,6 @@
 body {
   background-color: $color-quill-gray;
+  color: $color-baltic-sea;
 }
 
 .header {
@@ -31,37 +32,23 @@ body {
   border-bottom: 1px solid $color-baltic-sea;
 }
 
-.mask {
-    top: 0;
-    left: 0;
-    z-index: 99998;
-    background-color: #333;
-
-    &__content {
-        background-color: transparent;
-        top: 0;
-        left: 0;
-        z-index: 99999;
-
-        .spinner-border {
-            color: $color-saffron;
-        }
-    }
-
-    &.show {
-        opacity: 0.5;
-    }
-}
-
 .record {
-    height: 13rem;
     background-color: white;
     box-shadow: 1px 1px 5px #999;
     border-radius: 0.5rem;
 
+    &--default {
+      height: 13rem;
+    }
+
     &--add .fas {
         color: #999;
         font-size: 5rem;
+    }
+
+    &__cover {
+      border-top-right-radius: 0.4rem;
+      border-top-left-radius: 0.4rem;
     }
 
     &-form {
@@ -81,4 +68,17 @@ body {
             border-bottom: 1px solid #999;
         }
     }
+}
+
+.product {
+  height: 21rem;
+
+  &__link {
+    width: 60%;
+
+    &, &:active, &:invalid, &:visited, &:hover {
+      color: darken($color-saffron, 15);
+      text-decoration: none;
+    }
+  }
 }

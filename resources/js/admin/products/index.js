@@ -140,6 +140,12 @@ export class ProductsComponent extends AdminBaseComponent {
             this.form.reset();
             this.#resetImage();
         });
+
+        selector('#product-link').on('click', evt => {
+            if (!isNullOrUndefined(evt.target.value)) {
+                evt.target.select();
+            }
+        });
     }
 
     /**

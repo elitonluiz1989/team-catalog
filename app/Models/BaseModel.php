@@ -31,9 +31,9 @@ class BaseModel extends Model
     public function fill(array $attributes)
     {
         if ($this->exists) {
-            $attributes['user_updated_id'] = auth()->user()->id;
+            $attributes['user_updated_id'] = auth()->user()?->id;
         } else {
-            $attributes['user_created_id'] = auth()->user()->id;
+            $attributes['user_created_id'] = auth()->user()?->id;
         }
 
         return parent::fill($attributes);

@@ -10,16 +10,20 @@
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
 </head>
 
-<body class="antialiased">
-    <header class="header container-fluid">
+<body class="body body--admin antialiased">
+    <header class="header header--admin container-fluid">
         <nav class="navbar navbar-expand-lg">
             <div class="container-fluid">
                 <h1 class="header__title">
-                    <a class="navbar-brand" href="#">{{ env('APP_NAME') }}</a>
+                    <a class="navbar-brand d-block text-center text-md-start" href="{{ url('/') }}">{{ env('APP_NAME') }}</a>
                 </h1>
 
-                <button class="header__toggler navbar-toggler" type="button" data-bs-toggle="collapse"
-                    data-bs-target="#admin-navbar" aria-controls="admin-navbar" aria-expanded="false"
+                <button class="header__toggler navbar-toggler"
+                    type="button"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#admin-navbar"
+                    aria-controls="admin-navbar"
+                    aria-expanded="false"
                     aria-label="Toggle navigation">
                     <i class="fas fa-bars"></i>
                 </button>

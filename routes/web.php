@@ -25,6 +25,8 @@ Route::namespace('App\Http\Controllers')
                         Route::delete('/delete', 'FilesController@delete')->name('files.delete');
                     });
             });
+
+        Route::get('/', 'HomeController@index');
     });
 
 Route::namespace('App\Http\Controllers\Admin')

@@ -1,14 +1,34 @@
-body {
-  background-color: $color-quill-gray;
-  color: $color-baltic-sea;
+.body {
+  margin: 0;
+
+  &--default {
+    background-color: $color-baltic-sea;
+    color: $color-quill-gray;
+  }
+
+  &--admin {
+    background-color: $color-quill-gray;
+    color: $color-baltic-sea;
+  }
 }
 
 .header {
   height: fit-content;
-  background-color: $color-baltic-sea;
+
+  &--admin {
+    background-color: $color-baltic-sea;;
+  }
 
   %header-default-color {
     color: $color-saffron !important;
+  }
+
+  &__logo {
+    height: 2.5rem;
+    background-image: url('../images/logo.png');
+    background-position: center;
+    background-size: contain;
+    background-repeat: no-repeat;
   }
 
   &__title {
@@ -20,11 +40,26 @@ body {
   &__toggler {
     border-color: $color-saffron;
     @extend %header-default-color;
+
+    &--floating {
+      width: 3rem;
+      position: absolute;
+      top: 1%;
+      right: 1%;
+      z-index: 1;
+    }
   }
 
   .navbar-collapse a {
     @extend %header-default-color;
   }
+}
+
+.content {
+  min-height: 35rem;
+  height: fit-content;
+  background-color: $color-quill-gray;
+  color: $color-baltic-sea;
 }
 
 .page-title {
@@ -79,6 +114,20 @@ body {
     &, &:active, &:invalid, &:visited, &:hover {
       color: darken($color-saffron, 15);
       text-decoration: none;
+    }
+  }
+
+  &-view {
+    color:  $color-baltic-sea;
+    text-decoration: none;
+
+    &:hover {
+      color:  $color-baltic-sea;
+    }
+
+    &__name {
+      font-weight: bold;
+      font-size: 0.9em;
     }
   }
 }

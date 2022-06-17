@@ -3,9 +3,8 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Pagination\LengthAwarePaginator;
 
 /**
  * @property string $name
@@ -22,4 +21,8 @@ class Category extends BaseModel
         'user_updated_id',
         'user_deleted_id'
     ];
+
+    public function products(): HasMany {
+        return $this->hasMany(Product::class);
+    }
 }

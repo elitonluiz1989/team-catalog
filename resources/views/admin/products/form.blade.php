@@ -1,10 +1,13 @@
+@php
+$imageSize = 64;
+@endphp
+
 <div class="container-fluid">
     <div class="row">
         <div id="product-form-messages" class="col-12"></div>
     </div>
 
     <div class="form-field row mb-1">
-
         <div class="col-12">
             <div
                 id="uploader-image"
@@ -17,7 +20,12 @@
                     <small>Click to upload an image</small>
                 </div>
 
-                <img src="{{ asset('images/empty.png') }}" alt="uploaded image" id="product-image" class="ms-auto me-auto" width="64" height="64">
+                <img src="{{ asset('images/empty.png') }}"
+                    alt="uploaded image"
+                    id="product-image"
+                    class="ms-auto me-auto"
+                    width="{{ $imageSize }}"
+                    height="{{ $imageSize }}">
                 
                 <input type="hidden" name="image">
             </div>

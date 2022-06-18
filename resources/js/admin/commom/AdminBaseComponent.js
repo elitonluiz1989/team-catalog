@@ -113,6 +113,8 @@ export class AdminBaseComponent extends AppCoreComponent {
                 } catch (error) {
                     console.error(error);
                     alert(error.message);
+
+                    this.#disableAllButtons(eventTargetDto.parent, false);
                 }
 
                 await this.#mask.hide();

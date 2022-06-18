@@ -49,7 +49,14 @@ class Product extends BaseModel
         $filename = $path[count($path) - 1];
 
         return Attribute::make(
-            get: fn () => route('files.view', ['folder' => 'images', 'filename' => $filename, 'type' => FileTypeEnum::getKey(FileTypeEnum::IMAGE) ])
+            get: fn () => route(
+                'files.view',
+                [
+                    'folder' => 'images',
+                    'filename' => $filename,
+                    'type' => FileTypeEnum::getKey(FileTypeEnum::IMAGE)
+                ]
+            )
         );
     }
 }

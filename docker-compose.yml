@@ -11,6 +11,7 @@ services:
 
     volumes:
       - .:/app
+      - ./docker/php.ini:/usr/local/etc/php/php.ini
       - ./docker/xdebug.ini:/usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
       - ./docker/error_reporting.ini:/usr/local/etc/php/conf.d/error_reporting.ini
       - ./docker/logs/xdebug:/var/logs/xdebug

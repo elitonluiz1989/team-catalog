@@ -4,7 +4,6 @@
     </div>
 
     <div class="form-field row mb-1">
-
         <div class="col-12">
             <div
                 id="uploader-image"
@@ -17,7 +16,10 @@
                     <small>Click to upload an image</small>
                 </div>
 
-                <img src="{{ asset('images/empty.png') }}" alt="uploaded image" id="product-image" class="ms-auto me-auto" width="64" height="64">
+                <img src="{{ asset('images/empty.png') }}"
+                    alt="uploaded image"
+                    id="product-image"
+                    class="record-form__cover ms-auto me-auto">
                 
                 <input type="hidden" name="image">
             </div>

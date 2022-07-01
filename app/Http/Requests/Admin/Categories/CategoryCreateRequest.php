@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Admin\Categories;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class CategoryCreateRequest extends FormRequest
 {
@@ -24,8 +25,16 @@ class CategoryCreateRequest extends FormRequest
     public function rules()
     {
         return [
-            'name' => 'required|string|unique:categories',
-            'order' => 'required|integer|unique:categories'
+            'name' => [
+                'required',
+                'string',
+                Rule::unique('categories')->whereNull('deleted_at')
+            ],
+            'order' => [
+                'required',
+                'integer',
+                Rule::unique('categories')->whereNull('deleted_at')
+            ]
         ];
     }
 }

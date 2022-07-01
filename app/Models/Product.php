@@ -39,17 +39,22 @@ class Product extends BaseModel
     }
 
     public function imageSrc(): Attribute {
-        if (empty($this->image)) {
-            return Attribute::make(
-                get: fn () => asset('images/empty.png')
+        $src =  asset('images/empty.png');
+
+        if (!empty($this->image)) {
+            $filename = \basename($this->image);
+            $src = route(
+                'files.view',
+                [
+                    'folder' => 'images',
+                    'filename' => $filename,
+                    'type' => FileTypeEnum::getKey(FileTypeEnum::IMAGE)
+                ]
             );
         }
-        
-        $path = explode('/', $this->image);
-        $filename = $path[count($path) - 1];
 
         return Attribute::make(
-            get: fn () => route('files.view', ['folder' => 'images', 'filename' => $filename, 'type' => FileTypeEnum::getKey(FileTypeEnum::IMAGE) ])
+            get: fn () => $src
         );
     }
 }

@@ -11,9 +11,16 @@
         <div class="row justify-content-center justify-content-md-start mt-3">
             @foreach($categories as $category)
                 <div class="col-8 col-md-4 col-lg-3 col-xl-2 mb-3">
-                    <div class="record record--default w-100 d-flex flex-column ps-2 pe-2">
-                        <div class="record__item--bordered d-flex flex-fill w-100 align-items-center justify-content-center">
-                            <h3 class="text-break text-center">{{ $category->name }}</h3>
+                    <div class="category record w-100 d-flex flex-column ps-2 pe-2">
+                        <div class="record__cover d-flex flex-fill w-100 align-items-center justify-content-center mt-2 overflow-hidden">
+                            <img
+                                src="{{ $category->image_src }}"
+                                alt="{{ $category->name }} image"
+                                class="img-fluid">
+                        </div>
+
+                        <div class="record__item record__item--bordered pt-1 pb-1 text-center text-break">
+                            <h5 class="text-break">{{ $category->name }}</h5>
                         </div>
 
                         <div class="record__item record__item--bordered pt-3 pb-3 text-center text-break">Order {{ $category->order }}</div>
@@ -39,7 +46,7 @@
             <div class="col-8 col-md-4 col-lg-3 col-xl-2 d-flex mb-3">
                 <button
                     id="category-form-modal-opener-btn"
-                    class="record record--add btn w-100 d-flex align-items-center justify-content-center text-decoration-none"
+                    class="category record record--add btn w-100 d-flex align-items-center justify-content-center text-decoration-none"
                     data-bs-toggle="modal"
                     data-bs-target="#category-form-modal">
                     <i class="fas fa-plus"></i>

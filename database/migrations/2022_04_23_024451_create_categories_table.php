@@ -15,8 +15,9 @@ return new class extends Migration
     {
         Schema::create('categories', function (Blueprint $table) {
             $table->id();
-            $table->string('name')->unique();
-            $table->unsignedInteger('order')->unique();
+            $table->string('name');
+            $table->string('image')->nullable();
+            $table->unsignedInteger('order');
             $table->unsignedBigInteger('user_created_id')->nullable();
             $table->unsignedBigInteger('user_updated_id')->nullable();
             $table->unsignedBigInteger('user_deleted_id')->nullable();
@@ -35,6 +36,8 @@ return new class extends Migration
                 ->references('id')
                 ->on('users')
                 ->restrictOnDelete();
+
+            $table->unique(['name', 'order', 'user_deleted_id']);
         });
     }
 

@@ -59,6 +59,10 @@ body {
         &__title {
             border-bottom: 0.1rem solid #444;
         }
+
+        &__cover {
+          max-height: 96px;
+        }
     }
 
     &__item {
@@ -81,4 +85,8 @@ body {
       text-decoration: none;
     }
   }
+}
+
+.category {
+  height: 17rem;
 }

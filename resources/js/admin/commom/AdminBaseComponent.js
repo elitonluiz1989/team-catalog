@@ -1,15 +1,15 @@
-import {AppCoreComponent} from "../../core/AppCoreComponent";
-import {AppForm} from "../../core/Appform/Appform";
-import {AppFormDto} from "../../core/AppForm/Dtos/AppFormDto";
-import {AppFormMessageDto} from "../../core/AppFormMessage/Dtos/AppFormMessageDto";
-import {AppMask} from "../../core/AppMask/AppMask";
-import {AppMaskDto} from "../../core/AppMask/Dtos/AppMaskDto";
-import {AppRequestStatic} from "../../core/AppRequest/AppRequestStatic";
+import { AppCoreComponent } from "../../core/AppCoreComponent";
+import { AppForm } from "../../core/Appform/Appform";
+import { AppFormDto } from "../../core/AppForm/Dtos/AppFormDto";
+import { AppFormMessageDto } from "../../core/AppFormMessage/Dtos/AppFormMessageDto";
+import { AppMask } from "../../core/AppMask/AppMask";
+import { AppMaskDto } from "../../core/AppMask/Dtos/AppMaskDto";
+import { AppRequestStatic } from "../../core/AppRequest/AppRequestStatic";
 import HttpVerbsEnum from "../../core/AppRequest/Enums/HttpVerbsEnum";
-import {getEventTargetHandled, objectArrayToString, selector} from "../../core/helpers";
+import { Entity } from './../../core/Entity';
+import { getEventTargetHandled, objectArrayToString, selector, isFunction } from "../../core/helpers";
 
 import {getButtonEventTarget} from "../../helpers";
-import { isFunction } from './../../core/helpers';
 
 export class AdminBaseComponent extends AppCoreComponent {
     /**
@@ -24,25 +24,32 @@ export class AdminBaseComponent extends AppCoreComponent {
      */
     #mask;
 
-    /**
-     *
-     * @param {string} formId
-     * @param {string} formMessagesContainerId
-     * @param {AppModalDto} appModalDto
-     */
-    configureform(formId, formMessagesContainerId, appModalDto) {
+    getFormDto(formId, formMessagesContainerId) {
         const dto = new AppFormDto();
         dto.form = document.querySelector(formId);
         dto.message = new AppFormMessageDto();
         dto.message.container = formMessagesContainerId;
 
-        if (appModalDto) {
-            dto.modal = appModalDto;
-        }
+        return dto;
+    }
 
+    /**
+     *
+     * @param {AppFormDto} dto
+     * @param {Entity} record
+     */
+    configureform(dto, record = null) {
         this.form = new AppForm(dto);
         this.form.addInvalidFieldEventHandler();
         this.form.addSubmitEventHandler();
+
+        if (isFunction(dto.beforeSubmitHandler)) {
+            this.form.beforeSubmitHandler = dto.beforeSubmitHandler;
+        }
+
+        if (record) {
+            this.form.record = record;
+        }
 
         if (AppMask.isInstanceOf(this.#mask)) {
             this.form.setMask(this.#mask);
@@ -161,7 +168,6 @@ export class AdminBaseComponent extends AppCoreComponent {
                 this.#disableAllButtons(eventTargetDto.parent, false);
             });
     }
-
 
     #disableAllButtons = (container, disable = true) => {
         container?.iterateChildren(child => {

@@ -19,10 +19,8 @@ export class AppCore {
         const currentRoute = AppRequestStatic.route.path;
         const component = this.#components.find(c => c.route === currentRoute);
 
-        if (!component) {
-            throw new Error('Component not defined');
+        if (component) {
+            component.run();
         }
-
-        component.run();
     }
 }

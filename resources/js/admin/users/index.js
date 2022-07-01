@@ -10,16 +10,13 @@ export class UserComponent extends AdminBaseComponent {
     route = '/users';
 
     run() {
-        const appModalDto = new AppModalDto(
-            '#user-form-modal',
-            '#user-form-modal-opener-btn',
-            '#user-form-modal-dismiss-btn'
-        );
-        this.configureform(
-            '#user-form',
-            '#user-form-messages',
-            appModalDto
-        );
+        const modalDto = new AppModalDto();
+        modalDto.modalSelector = '#user-form-modal';
+        modalDto.openerButtonSelector = '#user-form-modal-opener-btn';
+        modalDto.dismissButtonSelector = '#user-form-modal-dismiss-btn';
+        const formDto = this.getFormDto('#user-form', '#user-form-messages');
+        formDto.modal = modalDto;
+        this.configureform(formDto);
         this.configureMask();
 
         /**
@@ -36,21 +33,19 @@ export class UserComponent extends AdminBaseComponent {
             form.disableFields('email', 'password');
             form.removeDisabledFieldsOnSubmit()
         };
-        const adminRecordEditEventDto = new AdminEditEventDto(
-            '.user__edit-action',
-            'findRoute',
-            'actionRoute',
-            fillForm
-        );
+        const editEventDto = new AdminEditEventDto();
+        editEventDto.selector = '.user__edit-action';
+        editEventDto.findRouteKey = 'findRoute';
+        editEventDto.actionRouteKey = 'actionRoute';
+        editEventDto.callback = fillForm;
 
-        this.addEditEvent(adminRecordEditEventDto);
+        this.addEditEvent(editEventDto);
 
-        const adminRemoveEventDto = new AdminRemoveEventDto(
-            '.user__remove-action',
-            'actionRoute',
-            'Are you sure to remove this user?'
-        );
+        const removeEventDto = new AdminRemoveEventDto();
+        removeEventDto.selector = '.user__remove-action';
+        removeEventDto.actionRouteKey = 'actionRoute';
+        removeEventDto.confirmMessage = 'Are you sure to remove this user?';
 
-        this.addRemoveEvent(adminRemoveEventDto);
+        this.addRemoveEvent(removeEventDto);
     }
 }

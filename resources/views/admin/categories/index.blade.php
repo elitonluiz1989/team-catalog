@@ -46,7 +46,7 @@
             <div class="col-8 col-md-4 col-lg-3 col-xl-2 d-flex mb-3">
                 <button
                     id="category-form-modal-opener-btn"
-                    class="record record--add btn w-100 d-flex align-items-center justify-content-center text-decoration-none"
+                    class="category record record--add btn w-100 d-flex align-items-center justify-content-center text-decoration-none"
                     data-bs-toggle="modal"
                     data-bs-target="#category-form-modal">
                     <i class="fas fa-plus"></i>
